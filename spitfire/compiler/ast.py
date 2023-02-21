@@ -7,10 +7,6 @@ import builtins
 import copy
 import traceback
 
-import sys
-sys.setrecursionlimit(15000)
-
-
 
 # this is a horrible hack to let the tree modify itself during conversion
 class EatPrevious(object):

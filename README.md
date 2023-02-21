@@ -13,6 +13,8 @@ templates.  Spitfire has been the primary template language for
 [youtube.com][] since 2008 and is used to generate
 [billions of views a day][].
 
+This particular fork is made so that Spitfire can work with Python 3.
+
 
 ## Example
 

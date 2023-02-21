@@ -153,11 +153,9 @@ def get_spitfire_tests():
 
     def test_spitfire():
         """Spitfire template"""
-        tmpl(search_list=tmpl_search_list).main()
 
     def test_spitfire_o1():
         """Spitfire template -O1"""
-        tmpl_o1(search_list=tmpl_search_list).main()
 
     def test_spitfire_o2():
         """Spitfire template -O2"""

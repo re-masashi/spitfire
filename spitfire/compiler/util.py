@@ -9,6 +9,7 @@ import os.path
 import re
 import sys
 
+
 from spitfire.compiler import options
 from spitfire.compiler import parser
 from spitfire.compiler import scanner
@@ -57,7 +58,7 @@ def parse_template(src_text, xspt_mode=False):
 def read_template_file(filename):
     f = open(filename, 'r')
     try:
-        return f.read().decode('utf8')
+        return f.read()
     finally:
         f.close()
 
@@ -122,7 +123,7 @@ def load_template(template_src,
                   analyzer_options=options.default_options,
                   compiler_options=None):
     class_name = filename2classname(template_name)
-    filename = '<%s>' % class_name
+    filename = '<+' + class_name + '>'
     module_name = class_name
     # Note: The compiler module is imported here to avoid a circular dependency
     from spitfire.compiler import compiler

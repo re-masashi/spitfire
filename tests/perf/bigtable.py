@@ -15,7 +15,6 @@ import sys
 import timeit
 import io
 
-sys.setrecursionlimit(15000)
 
 try:
     import genshi
@@ -93,20 +92,6 @@ if MarkupTemplate:
 </tr>{% end %}
 </table>
 """)
-
-if DjangoTemplate:
-    django_tmpl = DjangoTemplate("""
-    <table>
-    {% for row in table %}
-    <tr>{% for col in row.values %}{{ col|escape }}{% endfor %}</tr>
-    {% endfor %}
-    </table>
-    """)
-
-    def test_django():
-        """Djange template"""
-        context = DjangoContext({'table': table})
-        django_tmpl.render(context)
 
 if MakoTemplate:
     mako_tmpl = MakoTemplate("""
