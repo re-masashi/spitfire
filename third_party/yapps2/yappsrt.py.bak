@@ -2,9 +2,10 @@
 #
 # This module is needed to run generated parsers.
 
+from string import join, count, find, rfind
 import logging
 import re
-import io
+import StringIO
 import sys
 
 class SyntaxError(Exception):
@@ -28,13 +29,13 @@ class FatalParseError(Exception):
   """We have to fail-stop for one reason or another."""
 
 class Scanner(object):
-  def __init__(self, patterns, ignore, input_):
+  def __init__(self, patterns, ignore, input):
     """Patterns is [(terminal,regex)...]
     Ignore is [terminal,...];
     Input is a string"""
     self.tokens = []
     self.restrictions = []
-    self.input = input_
+    self.input = input
     self.pos = 0
     self.ignore = ignore
     # The stored patterns are a pair (compiled regex,source
@@ -108,7 +109,7 @@ class Scanner(object):
       if best_pat == '(error)' and best_match < 0:
         msg = "Bad Token"
         if restrict:
-          msg = "Trying to find one of "+restrict+", "
+          msg = "Trying to find one of "+join(restrict,", ")
         raise SyntaxError(self.pos, msg)
 
       # If we found something that isn't to be ignored, return it
@@ -152,29 +153,29 @@ class Parser(object):
     return self._scanner.file_position(self._pos)
 
 
-def format_error(input_, err, scanner):
+def format_error(input, err, scanner):
   """This is a really dumb long function to print error messages nicely."""
-  error_message = io.StringIO()
+  error_message = StringIO.StringIO()
   p = err.pos
-  print("error position", p, file=error_message)
+  print >> error_message, "error position", p
   # Figure out the line number
-  line = input_[:p].count("\n")
-  print(err.msg, "on line", repr(line+1) + ":", file=error_message)
+  line = count(input[:p], '\n')
+  print >> error_message, err.msg, "on line", repr(line+1) + ":"
   # Now try printing part of the line
-  text = input_[max(p-80, 0):p+80]
+  text = input[max(p-80, 0):p+80]
   p = p - max(p-80, 0)
 
   # Strip to the left
-  i = text[:p].rfind("\n")
-  j = text[:p].rfind("\n")
+  i = rfind(text[:p], '\n')
+  j = rfind(text[:p], '\r')
   if i < 0 or (0 <= j < i): i = j
   if 0 <= i < p:
     p = p - i - 1
   text = text[i+1:]
 
   # Strip to the right
-  i = text.find('\n', end=p)
-  i = text.find('\r', end=p)
+  i = find(text,'\n', p)
+  j = find(text,'\r', p)
   if i < 0 or (0 <= j < i):
     i = j
   if i >= 0:
@@ -187,22 +188,22 @@ def format_error(input_, err, scanner):
     p = p - 7
 
   # Now print the string, along with an indicator
-  print('> ', text.replace('\t', ' ').encode(sys.getdefaultencoding()), file=error_message)
-  print('> ', ' '*p + '^', file=error_message)
-  print('List of nearby tokens:', scanner, file=error_message)
+  print >> error_message, '> ', text.replace('\t', ' ').encode(sys.getdefaultencoding())
+  print >> error_message, '> ', ' '*p + '^'
+  print >> error_message, 'List of nearby tokens:', scanner
   return error_message.getvalue()
 
 
 def wrap_error_reporter(parser, rule):
   try:
     return getattr(parser, rule)()
-  except SyntaxError as e:
+  except SyntaxError, e:
     logging.exception('syntax error')
-    input_ = parser._scanner.input
+    input = parser._scanner.input
     try:
-      error_msg = format_error(input_, e, parser._scanner)
+      error_msg = format_error(input, e, parser._scanner)
     except ImportError:
-      error_msg = 'Syntax Error %s on line\n' % (e.msg, 1 + input_[:e.pos].count("\n"))
-  except NoMoreTokens as e:
+      error_msg = 'Syntax Error %s on line\n' % (e.msg, 1 + count(input[:e.pos]))
+  except NoMoreTokens, e:
     error_msg = 'Could not complete parsing; stopped around here:\n%s\n%s' % (parser._scanner, e)
   raise FatalParseError(error_msg)

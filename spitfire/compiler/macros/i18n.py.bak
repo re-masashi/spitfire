@@ -5,7 +5,7 @@
 
 import sys
 
-import io as StringIO
+import cStringIO as StringIO
 
 from spitfire.compiler import analyzer
 from spitfire.compiler import ast
@@ -77,4 +77,4 @@ def macro_function_i18n(call_node, arg_map, compiler):
             '$i18n argument "%s" must be a string literal' % msg_arg_node)
     i18n_msg = text.i18n_mangled_message(msg_arg_node.value)
     i18n_msg_utf8 = i18n_msg.encode(sys.getdefaultencoding())
-    return "'%s'" % i18n_msg.replace("'", "\\'")
+    return u"'%s'" % i18n_msg.replace("'", "\\'")

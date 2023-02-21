@@ -17,9 +17,9 @@ def debug(func_name, dom_node):
     if not enable_debug:
         return
     if dom_node.attributes:
-        print(func_name, dom_node.nodeName, list(dom_node.attributes.keys()))
+        print func_name, dom_node.nodeName, dom_node.attributes.keys()
     else:
-        print(func_name, dom_node.nodeName)
+        print func_name, dom_node.nodeName
 
 
 class XHTML2AST(object):
@@ -73,7 +73,7 @@ class XHTML2AST(object):
 
             # fixme: do I need keys() here? also, i think that attribute can be
             # None
-            attr_name_list = list(dom_node.attributes.keys())
+            attr_name_list = dom_node.attributes.keys()
             processed_any_op = False
             for op in op_precedence:
                 op_attr_name = '%s:%s' % (self.namespace, op)
@@ -93,7 +93,7 @@ class XHTML2AST(object):
             attr_output_ast = []
             attr_prune_list = []
             # this is horribly un-pythonic - i'm having Java flashbacks
-            for i in range(dom_node.attributes.length):
+            for i in xrange(dom_node.attributes.length):
                 attr = dom_node.attributes.item(i)
                 if attr.prefix == self.attr_op_namespace:
                     attr_prune_list.append(attr.localName)
@@ -106,7 +106,7 @@ class XHTML2AST(object):
                 try:
                     dom_node.removeAttribute(attr_name)
                 except xml.dom.NotFoundErr:
-                    print("ignoring missing", attr_name)
+                    print "ignoring missing", attr_name
 
             if not processed_any_op:
                 node_list.extend(self.handle_default(dom_node,
@@ -154,10 +154,10 @@ class XHTML2AST(object):
         node_name = dom_node.nodeName
         if close:
             if self.has_child_stuff(dom_node):
-                node_list.append(ast.TextNode('</%(node_name)s>' % vars()))
+                node_list.append(ast.TextNode(u'</%(node_name)s>' % vars()))
         else:
             attr_text = ' '.join(['%s="%s"' % (key, value)
-                                  for key, value in list(dom_node.attributes.items())
+                                  for key, value in dom_node.attributes.items()
                                   if not key.startswith('py:')])
             # fixme: this is starting to look fugly - hard to maintain and error
             # prone
@@ -165,40 +165,40 @@ class XHTML2AST(object):
                 if attr_text:
                     if attr_ast:
                         node_list.append(ast.TextNode(
-                            '<%(node_name)s %(attr_text)s' % vars()))
+                            u'<%(node_name)s %(attr_text)s' % vars()))
                         node_list.extend(attr_ast)
-                        node_list.append(ast.TextNode('>'))
+                        node_list.append(ast.TextNode(u'>'))
                     else:
                         node_list.append(ast.TextNode(
-                            '<%(node_name)s %(attr_text)s>' % vars()))
+                            u'<%(node_name)s %(attr_text)s>' % vars()))
                 else:
                     if attr_ast:
-                        node_list.append(ast.TextNode('<%(node_name)s' % vars(
+                        node_list.append(ast.TextNode(u'<%(node_name)s' % vars(
                         )))
                         node_list.extend(attr_ast)
-                        node_list.append(ast.TextNode('>'))
+                        node_list.append(ast.TextNode(u'>'))
                     else:
-                        node_list.append(ast.TextNode('<%(node_name)s>' % vars(
+                        node_list.append(ast.TextNode(u'<%(node_name)s>' % vars(
                         )))
             else:
                 if attr_text:
                     if attr_ast:
                         # print "XXX make_tag_node", dom_node.nodeName, attr_ast
                         node_list.append(ast.TextNode(
-                            '<%(node_name)s %(attr_text)s' % vars()))
+                            u'<%(node_name)s %(attr_text)s' % vars()))
                         node_list.extend(attr_ast)
-                        node_list.append(ast.TextNode(' />'))
+                        node_list.append(ast.TextNode(u' />'))
                     else:
                         node_list.append(ast.TextNode(
-                            '<%(node_name)s %(attr_text)s />' % vars()))
+                            u'<%(node_name)s %(attr_text)s />' % vars()))
                 else:
                     if attr_ast:
-                        node_list.append(ast.TextNode('<%(node_name)s' % vars(
+                        node_list.append(ast.TextNode(u'<%(node_name)s' % vars(
                         )))
                         node_list.extend(attr_ast)
-                        node_list.append(ast.TextNode(' />'))
+                        node_list.append(ast.TextNode(u' />'))
                     else:
-                        node_list.append(ast.TextNode('<%(node_name)s />' %
+                        node_list.append(ast.TextNode(u'<%(node_name)s />' %
                                                       vars()))
 
         omit_tag = getattr(dom_node, 'omit_tag', False)
@@ -217,7 +217,7 @@ class XHTML2AST(object):
         node_list = []
         new_attr_name = attr.localName
         attr_ast = util.parse(attr.nodeValue, 'rhs_expression')
-        node_list.append(ast.TextNode(' %(new_attr_name)s="' % vars()))
+        node_list.append(ast.TextNode(u' %(new_attr_name)s="' % vars()))
         # fixme: need to guarantee good output - escape sequences etc
         node_list.append(ast.PlaceholderSubstitutionNode(attr_ast))
         node_list.append(ast.TextNode('"'))
@@ -354,10 +354,10 @@ if __name__ == '__main__':
     x2a = XHTML2AST()
     filename = sys.argv[1]
     tnode = x2a.build_template(filename)
-    print(tnode)
+    print tnode
     classname = spitfire.compiler.util.filename2classname(filename)
     src = spitfire.compiler.util.compile_ast(tnode, classname)
-    print(src)
+    print src
     module = spitfire.compiler.util.load_module_from_src(src, '<none>',
                                                          classname)
     tclass = getattr(module, classname)
@@ -378,4 +378,4 @@ if __name__ == '__main__':
         'content_type': 'test/spitfire',
     }
 
-    print(tclass(search_list=[d]).main())
+    print tclass(search_list=[d]).main()

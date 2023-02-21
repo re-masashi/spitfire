@@ -9,7 +9,7 @@
 # syntactically, 'name' will always be a valid identifier - so you won't get
 # name='my attribute' - it must be a legal python identifier
 
-import builtins
+import __builtin__
 import inspect
 import logging
 import weakref
@@ -66,7 +66,7 @@ class CallOnlyPlaceholder(object):
         raise runtime.PlaceholderError(self.name,
                                        'function placeholder was not called')
 
-    def __bool__(self):
+    def __nonzero__(self):
         raise runtime.PlaceholderError(self.name,
                                        'function placeholder was not called')
 
@@ -180,7 +180,7 @@ def _resolve_placeholder(name, template, global_vars):
     # fixme: finally try to resolve builtins - this should be configurable
     # if you compile optimized modes, this isn't necessary
     try:
-        return getattr(__builtins__, name)
+        return getattr(__builtin__, name)
     except AttributeError:
         return UndefinedPlaceholder(name, search_list)
 

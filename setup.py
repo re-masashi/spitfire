@@ -41,15 +41,7 @@ PY_MODULES = ['third_party.yapps2.yappsrt']
 
 SCRIPTS = ['scripts/crunner.py', 'scripts/spitfire-compile']
 
-EXT_MODULES = [Extension('spitfire.runtime._baked',
-                         [os.path.join('spitfire', 'runtime', '_baked.c')]),
-               Extension('spitfire.runtime._template',
-                         [os.path.join('spitfire', 'runtime', '_template.c')]),
-               Extension('spitfire.runtime._udn',
-                         [os.path.join('spitfire', 'runtime', '_udn.c')])]
-# Disable C extensions for PyPy.
-if platform.python_implementation() == 'PyPy':
-    EXT_MODULES = None
+EXT_MODULES = None
 
 setup(name=NAME,
       description=DESCRIPTION,

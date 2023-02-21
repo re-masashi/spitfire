@@ -5,9 +5,8 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-
+from __future__ import print_function
 from future import standard_library
-import importlib
 standard_library.install_aliases()
 from builtins import str
 from builtins import object
@@ -265,7 +264,7 @@ class TestRunner(object):
 
 
 if __name__ == '__main__':
-    importlib.reload(sys)
+    reload(sys)
     sys.setdefaultencoding('utf8')
 
     option_parser = optparse.OptionParser()

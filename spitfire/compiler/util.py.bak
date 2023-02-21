@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 import logging
-import types
+import new
 import os.path
 import re
 import sys
@@ -106,7 +106,7 @@ def load_template_file(filename,
     spt_compiler = compiler.Compiler(analyzer_options=analyzer_options,
                                      xspt_mode=xspt_mode)
     if compiler_options:
-        for k, v in compiler_options.items():
+        for k, v in compiler_options.iteritems():
             setattr(spt_compiler, k, v)
     class_name = filename2classname(filename)
     if not module_name:
@@ -128,7 +128,7 @@ def load_template(template_src,
     from spitfire.compiler import compiler
     spt_compiler = compiler.Compiler(analyzer_options=analyzer_options)
     if compiler_options:
-        for k, v in compiler_options.items():
+        for k, v in compiler_options.iteritems():
             setattr(spt_compiler, k, v)
     src_code = spt_compiler.compile_template(template_src, class_name)
     module = load_module_from_src(src_code, filename, module_name)
@@ -137,11 +137,11 @@ def load_template(template_src,
 
 # a helper method to import a template without having to save it to disk
 def load_module_from_src(src_code, filename, module_name):
-    module = types.ModuleType(module_name)
+    module = new.module(module_name)
     sys.modules[module_name] = module
 
     bytecode = compile(src_code, filename, 'exec')
-    exec(bytecode, module.__dict__)
+    exec bytecode in module.__dict__
     return module
 
 

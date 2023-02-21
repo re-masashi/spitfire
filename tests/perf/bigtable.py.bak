@@ -13,10 +13,8 @@
 import cgi
 import sys
 import timeit
-import io
-
-sys.setrecursionlimit(15000)
-
+import StringIO
+import cStringIO
 try:
     import genshi
     from genshi.builder import tag
@@ -143,15 +141,15 @@ if SpitfireTemplate:
         spitfire_src, 'spitfire_tmpl')
 
     spitfire_tmpl_o1 = spitfire.compiler.util.load_template(
-        spitfire_src, 'spitfire_tmpl_o1', spitfire.compiler.options.o1_options,
+        spitfire_src, 'spitfire_tmpl_o1', spitfire.compiler.analyzer.o1_options,
         {'enable_filters':enable_filters})
 
     spitfire_tmpl_o2 = spitfire.compiler.util.load_template(
-        spitfire_src, 'spitfire_tmpl_o2', spitfire.compiler.options.o2_options,
+        spitfire_src, 'spitfire_tmpl_o2', spitfire.compiler.analyzer.o2_options,
         {'enable_filters':enable_filters})
 
     spitfire_tmpl_o3 = spitfire.compiler.util.load_template(
-        spitfire_src, 'spitfire_tmpl_o3', spitfire.compiler.options.o3_options,
+        spitfire_src, 'spitfire_tmpl_o3', spitfire.compiler.analyzer.o3_options,
         {'enable_filters':enable_filters})
 
 
@@ -168,6 +166,7 @@ if SpitfireTemplate:
     def test_spitfire_o2():
         """Spitfire template -O2"""
         data = spitfire_tmpl_o2(search_list=[{'table':table}]).main()
+        #print "spitfire -O2", len(data)
 
     def test_spitfire_o3():
         """Spitfire template -O3"""
@@ -184,10 +183,10 @@ if CheetahTemplate:
 </tr>
 #end for
 </table>"""
-    pre = set([k for k, v in sys.modules.items() if v])
+    pre = set([k for k, v in sys.modules.iteritems() if v])
     cheetah_template = CheetahTemplate.Template(cheetah_src, searchList=[{'table':table}])
     # force compile
-    post = set([k for k, v in sys.modules.items() if v])
+    post = set([k for k, v in sys.modules.iteritems() if v])
     #print post - pre
 
     #print type(cheetah_template)
@@ -209,14 +208,14 @@ if genshi:
     def disabled_test_genshi_text():
         """Genshi text template"""
         stream = genshi_text_tmpl.generate(table=table)
-        print("test_genshi_text", stream)
+        print "test_genshi_text", stream
         data = stream.render('text')
-        print("test_genshi_text", 'data', stream)
+        print "test_genshi_text", 'data', stream
 
     def test_genshi_builder():
         """Genshi template + tag builder"""
         stream = tag.TABLE([
-            tag.tr([tag.td(c) for c in list(row.values())])
+            tag.tr([tag.td(c) for c in row.values()])
             for row in table
         ]).generate()
         stream = genshi_tmpl2.generate(table=stream)
@@ -226,7 +225,7 @@ if genshi:
         """Genshi tag builder"""
         stream = tag.TABLE([
             tag.tr([
-                tag.td(c) for c in list(row.values())
+                tag.td(c) for c in row.values()
             ])
             for row in table
         ]).generate()
@@ -256,7 +255,7 @@ if kid:
             _table = cet.Element('table')
             for row in table:
                 td = cet.SubElement(_table, 'tr')
-                for c in list(row.values()):
+                for c in row.values():
                     cet.SubElement(td, 'td').text=str(c)
             kid_tmpl2.table = _table
             kid_tmpl2.serialize(output='html')
@@ -267,7 +266,7 @@ if et:
         _table = et.Element('table')
         for row in table:
             tr = et.SubElement(_table, 'tr')
-            for c in list(row.values()):
+            for c in row.values():
                 et.SubElement(tr, 'td').text=str(c)
         et.tostring(_table)
 
@@ -277,7 +276,7 @@ if cet:
         _table = cet.Element('table')
         for row in table:
             tr = cet.SubElement(_table, 'tr')
-            for c in list(row.values()):
+            for c in row.values():
                 cet.SubElement(tr, 'td').text=str(c)
         cet.tostring(_table)
 
@@ -301,12 +300,12 @@ if neo_cgi:
 
 def test_python_cstringio():
     """cStringIO"""
-    buffer = io.StringIO()
+    buffer = cStringIO.StringIO()
     write = buffer.write
     write('<table>\n')
     for row in table:
         write('<tr>\n')
-        for col in row.values():
+        for col in row.itervalues():
             write('<td>\n')
             write('%s' % col)
             write('\n</td>\n')
@@ -316,13 +315,13 @@ def test_python_cstringio():
 
 def test_python_stringio():
     """StringIO"""
-    buffer = io.StringIO()
+    buffer = StringIO.StringIO()
     write = buffer.write
 
     write('<table>\n')
     for row in table:
         write('<tr>\n')
-        for col in row.values():
+        for col in row.itervalues():
             write('<td>\n')
             write('%s' % col)
             write('\n</td>\n')
@@ -338,7 +337,7 @@ def test_python_array():
     write('<table>\n')
     for row in table:
         write('<tr>\n')
-        for col in row.values():
+        for col in row.itervalues():
             write('<td>\n')
             write('%s' % col)
             write('\n</td>\n')
@@ -359,7 +358,7 @@ def run(which=None, number=10):
              ]
 
     if which:
-        tests = [n for n in tests if n[5:] in which]
+        tests = filter(lambda n: n[5:] in which, tests)
 
     for test in [t for t in tests if hasattr(sys.modules[__name__], t)]:
         t = timeit.Timer(setup='from __main__ import %s;' % test,
@@ -370,7 +369,7 @@ def run(which=None, number=10):
             result = '   (not installed?)'
         else:
             result = '%16.2f ms' % (1000 * time)
-        print('%-35s %s' % (getattr(sys.modules[__name__], test).__doc__, result))
+        print '%-35s %s' % (getattr(sys.modules[__name__], test).__doc__, result)
 
 
 if __name__ == '__main__':

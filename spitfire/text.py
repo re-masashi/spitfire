@@ -8,7 +8,7 @@ import re
 import string
 import unicodedata
 
-normal_characters = string.lowercase + string.uppercase
+normal_characters = string.ascii_lowercase + string.ascii_uppercase
 mangled_character_names = [
     'LATIN SMALL LETTER A WITH RING ABOVE',
     'LATIN SMALL LETTER THORN',

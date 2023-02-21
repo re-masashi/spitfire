@@ -37,7 +37,7 @@ def passthrough_filter(value):
 def escape_html(value, quote=True):
     """Replace special characters '&', '<' and '>' by SGML entities."""
     value = simple_str_filter(value)
-    if isinstance(value, str):
+    if isinstance(value, basestring):
         value = value.replace("&", "&amp;")  # Must be done first!
         value = value.replace("<", "&lt;")
         value = value.replace(">", "&gt;")
@@ -49,7 +49,7 @@ def escape_html(value, quote=True):
 # deprecated
 def safe_values(value):
     """Deprecated - use simple_str_filter instead."""
-    if isinstance(value, (str, int, float,
+    if isinstance(value, (str, unicode, int, long, float,
                           runtime.UndefinedPlaceholder)):
         return value
     else:
@@ -58,7 +58,7 @@ def safe_values(value):
 
 def simple_str_filter(value):
     """Return a string if the input type is something primitive."""
-    if isinstance(value, (str, int, float,
+    if isinstance(value, (str, unicode, int, long, float,
                           runtime.UndefinedPlaceholder)):
         # fixme: why do force this conversion here?
         # do we want to be unicode or str?

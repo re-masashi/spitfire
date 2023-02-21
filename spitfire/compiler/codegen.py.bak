@@ -5,7 +5,7 @@
 
 import logging
 
-import io as StringIO
+import cStringIO as StringIO
 
 from spitfire.compiler import ast
 
@@ -70,7 +70,7 @@ class CodeGenerator(object):
     def generate_python(self, code_node):
         try:
             return code_node.src_line
-        except AttributeError as e:
+        except AttributeError, e:
             self.compiler.error(CodegenError("can't write code_node: %s\n\t%s" %
                                              (code_node, e)))
 
@@ -316,7 +316,7 @@ class CodeGenerator(object):
 
     def codegenASTLiteralNode(self, node):
         if (self.options and not self.options.generate_unicode and
-                isinstance(node.value, str)):
+                isinstance(node.value, basestring)):
             # If the node is the empty string, we should mark it as sanitized by
             # default. Eventually, all string literals should be marked as
             # sanitized.
@@ -694,7 +694,7 @@ class CodeGenerator(object):
         try:
             return [CodeNode(line % vars(node))
                     for line in v['AST%s_tmpl' % node.__class__.__name__]]
-        except KeyError as e:
+        except KeyError, e:
             self.compiler.error(CodegenError("no codegen for %s %s" % (type(
                 node), vars(node))))
 
