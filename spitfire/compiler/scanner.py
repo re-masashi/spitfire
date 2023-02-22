@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 from spitfire.compiler import parser
-from third_party.yapps2 import yappsrt
+from spitfire.third_party.yapps2 import yappsrt
 
 # SpitfireScanner uses the order of the match, not the length of the match to
 # determine what token to return. I'm not sure how fragille this is long-term,

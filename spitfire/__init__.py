@@ -1,3 +1,7 @@
+'''
+Spitfire port forPython3
+'''
+
 # Copyright 2007 The Spitfire Authors. All Rights Reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -5,7 +9,7 @@
 
 __author__ = 'Nafi Amaan Hossain' # Originally by Mike Solomon
 __author_email__ = '<nafines007@gmail.com>'
-__version__ = '0.7.15'
+__version__ = '0.001'
 __license__ = 'BSD License'
 
 import spitfire
@@ -21,12 +25,12 @@ class Environment():
 
 		o3_opts = spitfire.compiler.options.o3_options
 
-		file = open(self.home + '/' + filename)
+		file = open(os.getcwd()+ '/' + self.home + '/' + filename)
 
 		tmpl_o3 = spitfire.compiler.util.load_template(file.read(),
 		                                               'ample',
 		                                               analyzer_options=o3_opts)
-		return tmpl_o3(search_list=[{'table': opts}]).main()
+		return tmpl_o3(search_list=opts).main()
 
 
 

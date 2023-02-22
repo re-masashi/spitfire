@@ -9,7 +9,7 @@ import unittest
 from spitfire.compiler import ast
 from spitfire.compiler import util
 from spitfire.compiler import walker
-from third_party.yapps2 import yappsrt
+from spitfire.third_party.yapps2 import yappsrt
 
 
 class BaseTest(unittest.TestCase):
