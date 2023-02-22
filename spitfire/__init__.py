@@ -25,10 +25,10 @@ class Environment():
 
 		o3_opts = spitfire.compiler.options.o3_options
 
-		file = open(os.getcwd()+ '/' + self.home + '/' + filename)
+		file = open(self.home + '/' + filename)
 
 		tmpl_o3 = spitfire.compiler.util.load_template(file.read(),
-		                                               'ample',
+		                                               template_name,
 		                                               analyzer_options=o3_opts)
 		return tmpl_o3(search_list=opts).main()
 

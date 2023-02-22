@@ -12,6 +12,6 @@ TABLE_DATA = [
 ]
 
 print(env.render('ample.spf', 
-			[{"a":1,"b":2} for x in range(4)], 
+			[{'table': [{"a":1,"b":2} for x in range(4)]}], 
 			template_name="ample"
 ))
