@@ -47,6 +47,11 @@ except ImportError:
     kid = None
 
 try:
+    import jinja2
+except ImportError:
+    jinja2 = None
+
+try:
     from django.conf import settings
     settings.configure()
     from django.template import Context as DjangoContext
@@ -183,6 +188,23 @@ if CheetahTemplate:
         """Cheetah template"""
         data = cheetah_template(searchList=[{'table':table}]).respond()
         #print "cheetah", len(data)
+
+if jinja2:
+    template = jinja2.Environment().from_string(
+        """
+        <table>
+        {% for row in table %}
+        <tr>
+        {% for column in row.values() %}
+        <td>{{column}}</td>
+        {%endfor%}
+        </tr>
+        {%endfor%}
+        """
+        )
+    def test_jinja2():
+        '''Jinja2 templates'''
+        template.render(table=table)
 
 if genshi:
     def test_genshi():
@@ -340,7 +362,8 @@ def run(which=None, number=10):
              'test_cheetah',
              'test_spitfire', 'test_spitfire_o1',
              'test_spitfire_o2', 'test_spitfire_o3',
-             'test_python_stringio', 'test_python_cstringio', 'test_python_array'
+             'test_python_stringio', 'test_python_cstringio', 'test_python_array', 
+             'test_jinja2'
              ]
 
     if which:

@@ -52,24 +52,23 @@ This is by no means exhaustive proof that Spitfire is always
 fast, just that it can provide very high performance.
 
 ```
-# Python 2.7.6 [GCC 4.8.2] on linux, 6-core Intel Xeon E5-1650 V3 @ 3.50GHz
-$ python tests/benchmarks/render_benchmark.py  --compare --number 1000
+# Python 3.10.9 (main, Dec 19 2022, 17:35:49) [GCC 12.2.0] on linux
+$ python tests/benchmarks/render_benchmark.py
 Running benchmarks 1000 times each...
 
-Cheetah template                               18.76 ms
-Django template                               263.94 ms
-Django template autoescaped                   262.89 ms
-Jinja2 template                                 8.52 ms
-Jinja2 template autoescaped                    18.22 ms
-Mako template                                   3.25 ms
-Mako template autoescaped                      11.45 ms
-Python string template                         29.78 ms
-Python StringIO buffer                         20.92 ms
-Python cStringIO buffer                         5.93 ms
-Python list concatenation                       2.30 ms
-Spitfire template -O3                           6.60 ms
-Spitfire template baked -O3                     8.15 ms
-Spitfire template unfiltered -O3                2.17 ms
+Genshi tag builder                            646.05 ms
+Genshi template                               226.59 ms
+Genshi template + tag builder                 448.92 ms
+Mako Template                                  58.38 ms
+Spitfire template                              33.79 ms
+Spitfire template -O1                          20.66 ms
+Spitfire template -O2                          12.94 ms
+Spitfire template -O3                           8.19 ms
+StringIO                                        7.95 ms
+cStringIO                                       9.73 ms
+list concat                                     7.32 ms
+Jinja2 templates                               15.84 ms
+
 ```
 
 
