@@ -6,28 +6,26 @@
 # license that can be found in the LICENSE file.
 
 
+from spitfire.runtime import udn
+from spitfire.runtime import runner
+from spitfire import runtime
+from spitfire.compiler import visitor
+from spitfire.compiler import util
+from spitfire.compiler import options
+from spitfire.compiler import compiler
+import io as StringIO
+import traceback
+import time
+import sys
+import os.path
+import optparse
+import logging
+import copy
+from builtins import object
+from builtins import str
 from future import standard_library
 import importlib
 standard_library.install_aliases()
-from builtins import str
-from builtins import object
-import copy
-import logging
-import optparse
-import os.path
-import sys
-import time
-import traceback
-
-import io as StringIO
-
-from spitfire.compiler import compiler
-from spitfire.compiler import options
-from spitfire.compiler import util
-from spitfire.compiler import visitor
-from spitfire import runtime
-from spitfire.runtime import runner
-from spitfire.runtime import udn
 
 
 # this class let's me check if placeholder caching is working properly by
@@ -119,7 +117,8 @@ class TestRunner(object):
             self.num_tests_run, self.finish_time - self.start_time), file=sys.stderr)
         print(file=sys.stderr)
         if self.num_tests_failed > 0:
-            print('FAILED (failures=%d)' % self.num_tests_failed, file=sys.stderr)
+            print('FAILED (failures=%d)' %
+                  self.num_tests_failed, file=sys.stderr)
             sys.exit(1)
         else:
             print('OK', file=sys.stderr)
@@ -150,7 +149,8 @@ class TestRunner(object):
             if self.options.debug:
                 if 'parse_tree' in self.options.debug_flags:
                     print("parse_tree:", file=buffer)
-                    visitor.print_tree(self.compiler._parse_tree, output=buffer)
+                    visitor.print_tree(
+                        self.compiler._parse_tree, output=buffer)
                 if 'analyzed_tree' in self.options.debug_flags:
                     print("analyzed_tree:", file=buffer)
                     visitor.print_tree(self.compiler._analyzed_tree,
@@ -243,7 +243,7 @@ class TestRunner(object):
                 print('-' * 70, file=buffer)
                 print('Compare expected and actual output with:', file=buffer)
                 print(' '.join(['    diff -u', test_output_path,
-                                           current_output_path]), file=buffer)
+                                current_output_path]), file=buffer)
                 print('Show debug information for the test with:', file=buffer)
                 test_cmd = [arg for arg in sys.argv if arg not in self.files]
                 if '--debug' not in test_cmd:
@@ -300,11 +300,13 @@ if __name__ == '__main__':
     (spt_options, spt_args) = option_parser.parse_args()
     if spt_options.debug:
         spt_options.verbose = True
-        spt_options.debug_flags = getattr(spt_options, 'debug_flags').split(',')
+        spt_options.debug_flags = getattr(
+            spt_options, 'debug_flags').split(',')
     else:
         spt_options.debug_flags = []
 
-    udn.set_accelerator(spt_options.enable_c_accelerator, enable_test_mode=True)
+    udn.set_accelerator(spt_options.enable_c_accelerator,
+                        enable_test_mode=True)
 
     spt_compiler_args = compiler.Compiler.args_from_optparse(spt_options)
     spt_compiler = compiler.Compiler(**spt_compiler_args)

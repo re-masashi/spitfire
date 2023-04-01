@@ -12,6 +12,7 @@ from string import *
 import re
 from spitfire.third_party.yapps2.yappsrt import *
 
+
 class _SpitfireParserScanner(Scanner):
     patterns = [
         ("'[ \\t]*\\+[ \\t]*'", re.compile('[ \t]*\\+[ \t]*')),
@@ -64,7 +65,8 @@ class _SpitfireParserScanner(Scanner):
         ('SINGLE_LINE_COMMENT', re.compile('#.*?\n')),
         ('MULTI_LINE_COMMENT', re.compile('\\*[\\W\\w\\S\\s]+?\\*#')),
         ('ASSIGN_OPERATOR', re.compile('=')),
-        ('COMP_OPERATOR', re.compile('[ \t]*(<=|>=|==|>|<|!=|[ \t]+in[ \t]+)[ \t]*')),
+        ('COMP_OPERATOR', re.compile(
+            '[ \t]*(<=|>=|==|>|<|!=|[ \t]+in[ \t]+)[ \t]*')),
         ('OPEN_PAREN', re.compile('[ \t]*\\([ \t]*')),
         ('PLACEHOLDER_OPEN_PAREN', re.compile('\\([ \t]*')),
         ('CLOSE_PAREN', re.compile('[ \t]*\\)')),
@@ -90,14 +92,17 @@ class _SpitfireParserScanner(Scanner):
         ('TEXT', re.compile('[^\\\\#\\$\n]+')),
         ('END', re.compile('$')),
     ]
-    def __init__(self, str):
-        Scanner.__init__(self,None,[],str)
+
+    def __init__(self, str_):
+        Scanner.__init__(self, None, [], str_)
+
 
 class _SpitfireParser(Parser):
     def i18n_body(self):
         value = ''
         while 1:
-            _token_ = self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_BACKSLASH', 'TEXT', 'NEWLINE', 'START_PLACEHOLDER')
+            _token_ = self._peek(
+                'LITERAL_DOLLAR_SIGN', 'LITERAL_BACKSLASH', 'TEXT', 'NEWLINE', 'START_PLACEHOLDER')
             if _token_ == 'LITERAL_DOLLAR_SIGN':
                 LITERAL_DOLLAR_SIGN = self._scan('LITERAL_DOLLAR_SIGN')
                 value += LITERAL_DOLLAR_SIGN
@@ -110,10 +115,11 @@ class _SpitfireParser(Parser):
             elif _token_ == 'NEWLINE':
                 NEWLINE = self._scan('NEWLINE')
                 value += NEWLINE
-            else:# == 'START_PLACEHOLDER'
+            else:  # == 'START_PLACEHOLDER'
                 START_PLACEHOLDER = self._scan('START_PLACEHOLDER')
                 value += START_PLACEHOLDER
-            if self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_BACKSLASH', 'TEXT', 'NEWLINE', 'START_PLACEHOLDER', 'START_DIRECTIVE', 'END_DIRECTIVE') not in ['LITERAL_DOLLAR_SIGN', 'LITERAL_BACKSLASH', 'TEXT', 'NEWLINE', 'START_PLACEHOLDER']: break
+            if self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_BACKSLASH', 'TEXT', 'NEWLINE', 'START_PLACEHOLDER', 'START_DIRECTIVE', 'END_DIRECTIVE') not in ['LITERAL_DOLLAR_SIGN', 'LITERAL_BACKSLASH', 'TEXT', 'NEWLINE', 'START_PLACEHOLDER']:
+                break
         return value
 
     def CLOSE_DIRECTIVE(self):
@@ -125,13 +131,15 @@ class _SpitfireParser(Parser):
     def CLOSE_END_DIRECTIVE(self):
         if self._peek('SPACE', 'CLOSE_DIRECTIVE_TOKEN', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'") == 'SPACE':
             SPACE = self._scan('SPACE')
-        _token_ = self._peek('CLOSE_DIRECTIVE_TOKEN', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'")
+        _token_ = self._peek('CLOSE_DIRECTIVE_TOKEN', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH',
+                             'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'")
         if _token_ == 'CLOSE_DIRECTIVE_TOKEN':
             CLOSE_DIRECTIVE_TOKEN = self._scan('CLOSE_DIRECTIVE_TOKEN')
             return CLOSE_DIRECTIVE_TOKEN
         else:
             _token_ = self._peek('END')
-            if _token_ == 'END': return ''
+            if _token_ == 'END':
+                return ''
 
     def goal(self):
         template = ast.TemplateNode()
@@ -163,7 +171,8 @@ class _SpitfireParser(Parser):
         return fragment
 
     def statement(self):
-        _token_ = self._peek("'implements'", "'extends'", "'absolute_extends'", "'loose_resolution'", "'allow_raw'", "'allow_undeclared_globals'", "'from'", "'import'", "'slurp'", "'break'", "'continue'", "'global'", "'attr'", "'filter'", "'do'", "'set'", "'echo'")
+        _token_ = self._peek("'implements'", "'extends'", "'absolute_extends'", "'loose_resolution'", "'allow_raw'", "'allow_undeclared_globals'",
+                             "'from'", "'import'", "'slurp'", "'break'", "'continue'", "'global'", "'attr'", "'filter'", "'do'", "'set'", "'echo'")
         if _token_ == "'implements'":
             self._scan("'implements'")
             SPACE = self._scan('SPACE')
@@ -261,7 +270,7 @@ class _SpitfireParser(Parser):
             if _token_ == 'OPEN_BRACKET':
                 slice_node = self.slice_node(_lhs)
                 _lhs = slice_node
-            else:# in ['SPACE', 'ASSIGN_OPERATOR']
+            else:  # in ['SPACE', 'ASSIGN_OPERATOR']
                 pass
             if self._peek('SPACE', 'ASSIGN_OPERATOR') == 'SPACE':
                 SPACE = self._scan('SPACE')
@@ -272,7 +281,7 @@ class _SpitfireParser(Parser):
             _rhs = expression
             CLOSE_DIRECTIVE = self.CLOSE_DIRECTIVE()
             return ast.AssignNode(_lhs, _rhs)
-        else:# == "'echo'"
+        else:  # == "'echo'"
             self._scan("'echo'")
             SPACE = self._scan('SPACE')
             literal = self.literal()
@@ -312,7 +321,8 @@ class _SpitfireParser(Parser):
 
     def directive(self):
         START_DIRECTIVE = self._scan('START_DIRECTIVE')
-        _token_ = self._peek('SINGLE_LINE_COMMENT', 'MULTI_LINE_COMMENT', "'block'", "'i18n'", "'def'", "'for[ \\t]*'", "'strip_lines'", "'if'", "'implements'", "'extends'", "'absolute_extends'", "'loose_resolution'", "'allow_raw'", "'allow_undeclared_globals'", "'from'", "'import'", "'slurp'", "'break'", "'continue'", "'global'", "'attr'", "'filter'", "'do'", "'set'", "'echo'", 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'")
+        _token_ = self._peek('SINGLE_LINE_COMMENT', 'MULTI_LINE_COMMENT', "'block'", "'i18n'", "'def'", "'for[ \\t]*'", "'strip_lines'", "'if'", "'implements'", "'extends'", "'absolute_extends'", "'loose_resolution'", "'allow_raw'", "'allow_undeclared_globals'", "'from'", "'import'",
+                             "'slurp'", "'break'", "'continue'", "'global'", "'attr'", "'filter'", "'do'", "'set'", "'echo'", 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'")
         if _token_ == 'SINGLE_LINE_COMMENT':
             SINGLE_LINE_COMMENT = self._scan('SINGLE_LINE_COMMENT')
             return ast.CommentNode(START_DIRECTIVE + SINGLE_LINE_COMMENT)
@@ -445,7 +455,8 @@ class _SpitfireParser(Parser):
                 while self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'TEXT', 'END_DIRECTIVE') != 'END_DIRECTIVE':
                     block = self.block(start)
                     _last_condition_node.else_.append(block)
-                self.make_optional(_last_condition_node.else_.child_nodes, start)
+                self.make_optional(
+                    _last_condition_node.else_.child_nodes, start)
             END_DIRECTIVE = self._scan('END_DIRECTIVE')
             SPACE = self._scan('SPACE')
             self._scan("'if'")
@@ -459,7 +470,8 @@ class _SpitfireParser(Parser):
             return ast.TextNode(START_DIRECTIVE)
 
     def block(self, start=False):
-        _token_ = self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'TEXT')
+        _token_ = self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH',
+                             'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'TEXT')
         if _token_ == 'LITERAL_DOLLAR_SIGN':
             LITERAL_DOLLAR_SIGN = self._scan('LITERAL_DOLLAR_SIGN')
             return ast.TextNode('$')
@@ -481,7 +493,8 @@ class _SpitfireParser(Parser):
             _node_list.append(ast.WhitespaceNode(SPACE))
             if self._peek('START_DIRECTIVE', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'") == 'START_DIRECTIVE':
                 directive = self.directive()
-                if start: _node_list[-1] = ast.OptionalWhitespaceNode(SPACE)
+                if start:
+                    _node_list[-1] = ast.OptionalWhitespaceNode(SPACE)
                 _node_list.append(directive)
             return _node_list
         elif _token_ == 'NEWLINE':
@@ -496,29 +509,33 @@ class _SpitfireParser(Parser):
                     _node_list[-1] = ast.OptionalWhitespaceNode(SPACE)
                     _node_list.append(directive)
             return _node_list
-        else:# == 'START_PLACEHOLDER'
+        else:  # == 'START_PLACEHOLDER'
             _parameter_list = None
             START_PLACEHOLDER = self._scan('START_PLACEHOLDER')
             _primary = ast.TextNode(START_PLACEHOLDER)
             if self._peek('PLACEHOLDER_OPEN_BRACE', 'ID', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'") in ['PLACEHOLDER_OPEN_BRACE', 'ID']:
                 _token_ = self._peek('PLACEHOLDER_OPEN_BRACE', 'ID')
                 if _token_ == 'PLACEHOLDER_OPEN_BRACE':
-                    PLACEHOLDER_OPEN_BRACE = self._scan('PLACEHOLDER_OPEN_BRACE')
+                    PLACEHOLDER_OPEN_BRACE = self._scan(
+                        'PLACEHOLDER_OPEN_BRACE')
                     placeholder_in_text = self.placeholder_in_text()
                     _primary = placeholder_in_text
                     if self._peek('PIPE', 'PLACEHOLDER_CLOSE_BRACE') == 'PIPE':
                         PIPE = self._scan('PIPE')
                         placeholder_parameter_list = self.placeholder_parameter_list()
                         _parameter_list = placeholder_parameter_list
-                    PLACEHOLDER_CLOSE_BRACE = self._scan('PLACEHOLDER_CLOSE_BRACE')
-                else:# == 'ID'
+                    PLACEHOLDER_CLOSE_BRACE = self._scan(
+                        'PLACEHOLDER_CLOSE_BRACE')
+                else:  # == 'ID'
                     placeholder_in_text = self.placeholder_in_text()
                     _primary = placeholder_in_text
-            if type(_primary) != ast.TextNode: return ast.PlaceholderSubstitutionNode(_primary, _parameter_list)
+            if type(_primary) != ast.TextNode:
+                return ast.PlaceholderSubstitutionNode(_primary, _parameter_list)
             return _primary
 
     def text_or_placeholders(self, start=False):
-        _token_ = self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'TEXT')
+        _token_ = self._peek('LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH',
+                             'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'TEXT')
         if _token_ == 'LITERAL_DOLLAR_SIGN':
             LITERAL_DOLLAR_SIGN = self._scan('LITERAL_DOLLAR_SIGN')
             return ast.TextNode('$')
@@ -545,26 +562,30 @@ class _SpitfireParser(Parser):
                 SPACE = self._scan('SPACE')
                 _node_list.append(ast.WhitespaceNode(SPACE))
             return _node_list
-        else:# == 'START_PLACEHOLDER'
+        else:  # == 'START_PLACEHOLDER'
             _parameter_list = None
             START_PLACEHOLDER = self._scan('START_PLACEHOLDER')
             _primary = ast.TextNode(START_PLACEHOLDER)
             if self._peek('PLACEHOLDER_OPEN_BRACE', 'ID', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'TEXT') in ['PLACEHOLDER_OPEN_BRACE', 'ID']:
                 _token_ = self._peek('PLACEHOLDER_OPEN_BRACE', 'ID')
                 if _token_ == 'PLACEHOLDER_OPEN_BRACE':
-                    PLACEHOLDER_OPEN_BRACE = self._scan('PLACEHOLDER_OPEN_BRACE')
+                    PLACEHOLDER_OPEN_BRACE = self._scan(
+                        'PLACEHOLDER_OPEN_BRACE')
                     placeholder_in_text = self.placeholder_in_text()
                     _primary = placeholder_in_text
                     if self._peek('PIPE', 'PLACEHOLDER_CLOSE_BRACE') == 'PIPE':
                         PIPE = self._scan('PIPE')
                         placeholder_parameter_list = self.placeholder_parameter_list()
                         _parameter_list = placeholder_parameter_list
-                    PLACEHOLDER_CLOSE_BRACE = self._scan('PLACEHOLDER_CLOSE_BRACE')
-                else:# == 'ID'
+                    PLACEHOLDER_CLOSE_BRACE = self._scan(
+                        'PLACEHOLDER_CLOSE_BRACE')
+                else:  # == 'ID'
                     placeholder_in_text = self.placeholder_in_text()
                     _primary = placeholder_in_text
-            if type(_primary) == ast.TextNode: return _primary
-            _placeholder_sub = ast.PlaceholderSubstitutionNode(_primary, _parameter_list)
+            if type(_primary) == ast.TextNode:
+                return _primary
+            _placeholder_sub = ast.PlaceholderSubstitutionNode(
+                _primary, _parameter_list)
             return _placeholder_sub
 
     def text(self):
@@ -575,7 +596,8 @@ class _SpitfireParser(Parser):
         ID = self._scan('ID')
         _primary = ast.PlaceholderNode(ID)
         while self._peek('DOT', 'PLACEHOLDER_OPEN_PAREN', 'OPEN_BRACKET', 'PIPE', 'PLACEHOLDER_CLOSE_BRACE', 'END', 'LITERAL_DOLLAR_SIGN', 'LITERAL_HASH', 'LITERAL_BACKSLASH', 'START_DIRECTIVE', 'SPACE', 'NEWLINE', 'START_PLACEHOLDER', 'END_DIRECTIVE', "'#elif'", 'TEXT', "'#else'") in ['DOT', 'PLACEHOLDER_OPEN_PAREN', 'OPEN_BRACKET']:
-            placeholder_suffix_expression = self.placeholder_suffix_expression(_primary)
+            placeholder_suffix_expression = self.placeholder_suffix_expression(
+                _primary)
             _primary = placeholder_suffix_expression
         return _primary
 
@@ -593,7 +615,7 @@ class _SpitfireParser(Parser):
                 _arg_list = argument_list
             CLOSE_PAREN = self._scan('CLOSE_PAREN')
             _primary = ast.CallFunctionNode(_previous_primary, _arg_list)
-        else:# == 'OPEN_BRACKET'
+        else:  # == 'OPEN_BRACKET'
             slice_node = self.slice_node(_previous_primary)
             _primary = slice_node
         return _primary
@@ -601,7 +623,8 @@ class _SpitfireParser(Parser):
     def placeholder(self):
         START_PLACEHOLDER = self._scan('START_PLACEHOLDER')
         _token_ = self._peek('ID')
-        if _token_ == 'ID': return ast.PlaceholderNode(self._scan('ID'))
+        if _token_ == 'ID':
+            return ast.PlaceholderNode(self._scan('ID'))
         return ast.TextNode(START_PLACEHOLDER)
 
     def target_list(self):
@@ -634,7 +657,7 @@ class _SpitfireParser(Parser):
             target_list = self.target_list()
             CLOSE_PAREN = self._scan('CLOSE_PAREN')
             return target_list
-        else:# == 'OPEN_BRACKET'
+        else:  # == 'OPEN_BRACKET'
             OPEN_BRACKET = self._scan('OPEN_BRACKET')
             target_list = self.target_list()
             CLOSE_BRACKET = self._scan('CLOSE_BRACKET')
@@ -683,7 +706,7 @@ class _SpitfireParser(Parser):
         if _token_ != 'ID':
             literal = self.literal()
             return literal
-        else:# == 'ID'
+        else:  # == 'ID'
             identifier = self.identifier()
             return identifier
 
@@ -713,7 +736,7 @@ class _SpitfireParser(Parser):
             DOUBLE_QUOTE_STR = self._scan('DOUBLE_QUOTE_STR')
             self._scan('\'"\'')
             return str(eval('"%s"' % DOUBLE_QUOTE_STR))
-        else:# == '"\'"'
+        else:  # == '"\'"'
             self._scan('"\'"')
             SINGLE_QUOTE_STR = self._scan('SINGLE_QUOTE_STR')
             self._scan('"\'"')
@@ -730,7 +753,7 @@ class _SpitfireParser(Parser):
         elif _token_ != 'NUM':
             stringliteral = self.stringliteral()
             return ast.LiteralNode(stringliteral)
-        else:# == 'NUM'
+        else:  # == 'NUM'
             NUM = self._scan('NUM')
             int_part = NUM
             if self._peek('"\\."', 'SPACE', 'CLOSE_DIRECTIVE_TOKEN', 'DOT', 'PLACEHOLDER_OPEN_PAREN', 'OPEN_BRACKET', 'COMMA_DELIMITER', "'[ \\t]*\\*[ \\t]*'", 'CLOSE_PAREN', "'[ \\t]*\\/[ \\t]*'", "'[ \\t]*\\%[ \\t]*'", 'PLACEHOLDER_CLOSE_BRACE', "'[ \\t]*\\+[ \\t]*'", "'[ \\t]*\\-[ \\t]*'", 'COMP_OPERATOR', "'[ \\t]*and[ \\t]*'", "'[ \\t]*or[ \\t]*'", 'END', 'COLON_DELIMITER', 'ASSIGN_OPERATOR', 'CLOSE_BRACKET', 'CLOSE_BRACE') == '"\\."':
@@ -744,14 +767,16 @@ class _SpitfireParser(Parser):
         return ast.IdentifierNode(ID)
 
     def primary(self, in_placeholder_context=False):
-        _token_ = self._peek('START_PLACEHOLDER', 'ID', '"True"', '"False"', '\'"\'', '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE')
+        _token_ = self._peek('START_PLACEHOLDER', 'ID', '"True"', '"False"',
+                             '\'"\'', '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE')
         if _token_ == 'START_PLACEHOLDER':
             placeholder = self.placeholder()
             _primary = placeholder
         elif _token_ == 'ID':
             identifier = self.identifier()
             _primary = identifier
-            if in_placeholder_context: _primary = ast.PlaceholderNode(_primary.name)
+            if in_placeholder_context:
+                _primary = ast.PlaceholderNode(_primary.name)
         elif _token_ not in ['OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE']:
             literal = self.literal()
             _primary = literal
@@ -779,7 +804,7 @@ class _SpitfireParser(Parser):
                     _tuple_literal.append(expression)
             CLOSE_PAREN = self._scan('CLOSE_PAREN')
             _primary = _tuple_literal
-        else:# == 'OPEN_BRACE'
+        else:  # == 'OPEN_BRACE'
             OPEN_BRACE = self._scan('OPEN_BRACE')
             _dict_literal = ast.DictLiteralNode()
             if self._peek('COMMA_DELIMITER', 'CLOSE_BRACE', 'PLACEHOLDER_CLOSE_BRACE', '"[ \\t]*not[ \\t]*"', 'START_PLACEHOLDER', 'ID', '"True"', '"False"', '\'"\'', '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE', "'[ \\t]*\\-[ \\t]*'") not in ['COMMA_DELIMITER', 'CLOSE_BRACE', 'PLACEHOLDER_CLOSE_BRACE']:
@@ -798,11 +823,12 @@ class _SpitfireParser(Parser):
             _token_ = self._peek('CLOSE_BRACE', 'PLACEHOLDER_CLOSE_BRACE')
             if _token_ == 'CLOSE_BRACE':
                 CLOSE_BRACE = self._scan('CLOSE_BRACE')
-            else:# == 'PLACEHOLDER_CLOSE_BRACE'
+            else:  # == 'PLACEHOLDER_CLOSE_BRACE'
                 PLACEHOLDER_CLOSE_BRACE = self._scan('PLACEHOLDER_CLOSE_BRACE')
             _primary = _dict_literal
         while self._peek('DOT', 'PLACEHOLDER_OPEN_PAREN', 'OPEN_BRACKET', "'[ \\t]*\\*[ \\t]*'", "'[ \\t]*\\/[ \\t]*'", "'[ \\t]*\\%[ \\t]*'", "'[ \\t]*\\+[ \\t]*'", "'[ \\t]*\\-[ \\t]*'", 'COMP_OPERATOR', "'[ \\t]*and[ \\t]*'", "'[ \\t]*or[ \\t]*'", 'SPACE', 'CLOSE_DIRECTIVE_TOKEN', 'END', 'COMMA_DELIMITER', 'COLON_DELIMITER', 'ASSIGN_OPERATOR', 'CLOSE_BRACKET', 'CLOSE_PAREN', 'CLOSE_BRACE', 'PLACEHOLDER_CLOSE_BRACE') in ['DOT', 'PLACEHOLDER_OPEN_PAREN', 'OPEN_BRACKET']:
-            placeholder_suffix_expression = self.placeholder_suffix_expression(_primary)
+            placeholder_suffix_expression = self.placeholder_suffix_expression(
+                _primary)
             _primary = placeholder_suffix_expression
         return _primary
 
@@ -827,7 +853,9 @@ class _SpitfireParser(Parser):
             _arg = expression
         if self._peek('ASSIGN_OPERATOR', 'COMMA_DELIMITER', 'END', 'CLOSE_PAREN') == 'ASSIGN_OPERATOR':
             ASSIGN_OPERATOR = self._scan('ASSIGN_OPERATOR')
-            if not isinstance(_arg, (ast.IdentifierNode)): raise SyntaxError(self._scanner.pos, "keyword arg can't be complex expression: %s" % _arg)
+            if not isinstance(_arg, (ast.IdentifierNode)):
+                raise SyntaxError(
+                    self._scanner.pos, "keyword arg can't be complex expression: %s" % _arg)
             _karg = ast.ParameterNode(_arg.name)
             _arg = None
             expression = self.expression()
@@ -841,7 +869,8 @@ class _SpitfireParser(Parser):
                 expression = self.expression()
                 _karg.default = expression
                 _kargs.append(_karg)
-        if _arg: _pargs.append(_arg)
+        if _arg:
+            _pargs.append(_arg)
         return ast.ArgListNode(_pargs, _kargs)
 
     def expression(self):
@@ -867,21 +896,23 @@ class _SpitfireParser(Parser):
         return _test
 
     def not_test(self):
-        _token_ = self._peek('"[ \\t]*not[ \\t]*"', 'START_PLACEHOLDER', 'ID', '"True"', '"False"', '\'"\'', '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE', "'[ \\t]*\\-[ \\t]*'")
+        _token_ = self._peek('"[ \\t]*not[ \\t]*"', 'START_PLACEHOLDER', 'ID', '"True"', '"False"',
+                             '\'"\'', '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE', "'[ \\t]*\\-[ \\t]*'")
         if _token_ != '"[ \\t]*not[ \\t]*"':
             comparison = self.comparison()
             return comparison
-        else:# == '"[ \\t]*not[ \\t]*"'
+        else:  # == '"[ \\t]*not[ \\t]*"'
             self._scan('"[ \\t]*not[ \\t]*"')
             not_test = self.not_test()
             return ast.UnaryOpNode('not', not_test)
 
     def u_expr(self):
-        _token_ = self._peek('START_PLACEHOLDER', 'ID', '"True"', '"False"', '\'"\'', '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE', "'[ \\t]*\\-[ \\t]*'")
+        _token_ = self._peek('START_PLACEHOLDER', 'ID', '"True"', '"False"', '\'"\'',
+                             '"\'"', 'NUM', 'OPEN_BRACKET', 'OPEN_PAREN', 'OPEN_BRACE', "'[ \\t]*\\-[ \\t]*'")
         if _token_ != "'[ \\t]*\\-[ \\t]*'":
             primary = self.primary()
             return primary
-        else:# == "'[ \\t]*\\-[ \\t]*'"
+        else:  # == "'[ \\t]*\\-[ \\t]*'"
             self._scan("'[ \\t]*\\-[ \\t]*'")
             u_expr = self.u_expr()
             return ast.UnaryOpNode('-', u_expr)
@@ -922,7 +953,8 @@ class _SpitfireParser(Parser):
         while self._peek('COMP_OPERATOR', "'[ \\t]*and[ \\t]*'", "'[ \\t]*or[ \\t]*'", 'SPACE', 'CLOSE_DIRECTIVE_TOKEN', 'END', 'COMMA_DELIMITER', 'COLON_DELIMITER', 'ASSIGN_OPERATOR', 'CLOSE_BRACKET', 'CLOSE_PAREN', 'CLOSE_BRACE', 'PLACEHOLDER_CLOSE_BRACE') == 'COMP_OPERATOR':
             COMP_OPERATOR = self._scan('COMP_OPERATOR')
             a_expr = self.a_expr()
-            _left_side = ast.BinOpExpressionNode(COMP_OPERATOR.strip(), _left_side, a_expr)
+            _left_side = ast.BinOpExpressionNode(
+                COMP_OPERATOR.strip(), _left_side, a_expr)
         return _left_side
 
     def slice_node(self, _expression):
@@ -938,14 +970,12 @@ def parse(rule, text):
     return wrap_error_reporter(P, rule)
 
 
-
-
 @ast.track_line_numbers(exempt_methods="make_optional")
 class SpitfireParser(_SpitfireParser):
-  strip_whitespace = False
+    strip_whitespace = False
 
-  def make_optional(self, node_list, starts_new_line=False):
-    if self.strip_whitespace:
-      return ast.strip_whitespace(node_list, starts_new_line=starts_new_line)
-    else:
-      return ast.make_optional(node_list)
+    def make_optional(self, node_list, starts_new_line=False):
+        if self.strip_whitespace:
+            return ast.strip_whitespace(node_list, starts_new_line=starts_new_line)
+        else:
+            return ast.make_optional(node_list)

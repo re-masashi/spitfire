@@ -33,18 +33,19 @@ def filename2modulename(filename):
 
 
 # @return abstract syntax tree rooted on a ast.TemplateNode
-def parse(src_text, rule='goal'):
+def parse(src_text, rule='goal', filename=None):
     spt_parser = parser.SpitfireParser(scanner.SpitfireScanner(src_text))
+    setattr(spt_parser, "filename",filename)
     return parser.wrap_error_reporter(spt_parser, rule)
 
 
 def parse_file(filename, xspt_mode=False):
-    template_node = parse_template(read_template_file(filename), xspt_mode)
+    template_node = parse_template(read_template_file(filename), xspt_mode, filename)
     template_node.source_path = filename
     return template_node
 
 
-def parse_template(src_text, xspt_mode=False):
+def parse_template(src_text, xspt_mode=False, filename=None):
     if xspt_mode:
         # Note: The compiler module is imported here to avoid a circular
         # dependency.
@@ -52,7 +53,7 @@ def parse_template(src_text, xspt_mode=False):
         xspt_parser = xhtml2ast.XHTML2AST()
         return xspt_parser.parse(src_text)
     else:
-        return parse(src_text)
+        return parse(src_text, filename=filename)
 
 
 def read_template_file(filename):
@@ -148,4 +149,4 @@ def load_module_from_src(src_code, filename, module_name):
 
 # convert and extends path to a file path
 def extends2path(class_extend):
-    return class_extend.replace('.', '/') + '.spt'
+    return class_extend.replace('.', '/') + '.spf'

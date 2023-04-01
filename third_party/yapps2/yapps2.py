@@ -26,11 +26,13 @@
 # * Style change: replaced raise "string exception" with raise
 #   ClassException(...) (thanks Alex Verstak)
 
+from string import *
 from .yappsrt import *
 import sys
 import re
 
 INDENT = " "*4
+
 
 class Generator:
     def __init__(self, name, options, tokens, rules):
@@ -40,10 +42,10 @@ class Generator:
         self.preparser = ''
         self.postparser = None
 
-        self.tokens = {} # Map from tokens to regexps
-        self.ignore = [] # List of token names to ignore in parsing
-        self.terminals = [] # List of token names (to maintain ordering)
-        for n,t in tokens:
+        self.tokens = {}  # Map from tokens to regexps
+        self.ignore = []  # List of token names to ignore in parsing
+        self.terminals = []  # List of token names (to maintain ordering)
+        for n, t in tokens:
             if n == '#ignore':
                 n = t
                 self.ignore.append(n)
@@ -52,10 +54,10 @@ class Generator:
             self.tokens[n] = t
             self.terminals.append(n)
 
-        self.rules = {} # Map from rule names to parser nodes
-        self.params = {} # Map from rule names to parameters
-        self.goals = [] # List of rule names (to maintain ordering)
-        for n,p,r in rules:
+        self.rules = {}  # Map from rule names to parser nodes
+        self.params = {}  # Map from rule names to parameters
+        self.goals = []  # List of rule names (to maintain ordering)
+        for n, p, r in rules:
             self.params[n] = p
             self.rules[n] = r
             self.goals.append(n)
@@ -75,13 +77,16 @@ class Generator:
     def subset(self, a, b):
         "See if all elements of a are inside b"
         for x in a:
-            if x not in b: return 0
+            if x not in b:
+                return 0
         return 1
 
     def equal_set(self, a, b):
         "See if a and b have the same elements"
-        if len(a) != len(b): return 0
-        if a == b: return 1
+        if len(a) != len(b):
+            return 0
+        if a == b:
+            return 1
         return self.subset(a, b) and self.subset(b, a)
 
     def add_to(self, parent, additions):
@@ -100,8 +105,10 @@ class Generator:
             self.output.write(a)
 
     def in_test(self, x, full, b):
-        if not b: return '0'
-        if len(b) == 1: return '%s == %s' % (x, repr(b[0]))
+        if not b:
+            return '0'
+        if len(b) == 1:
+            return '%s == %s' % (x, repr(b[0]))
         if full and len(b) > len(full)/2:
             # Reverse the sense of the test.
             not_b = list(filter(lambda x, b=b: x not in b, full))
@@ -109,36 +116,45 @@ class Generator:
         return '%s in %s' % (x, repr(b))
 
     def not_in_test(self, x, full, b):
-        if not b: return '1'
-        if len(b) == 1: return '%s != %s' % (x, repr(b[0]))
+        if not b:
+            return '1'
+        if len(b) == 1:
+            return '%s != %s' % (x, repr(b[0]))
         return '%s not in %s' % (x, repr(b))
 
     def peek_call(self, a):
         a_set = (repr(a)[1:-1])
-        if self.equal_set(a, self.non_ignored_tokens()): a_set = ''
-        if self['context-insensitive-scanner']: a_set = ''
+        if self.equal_set(a, self.non_ignored_tokens()):
+            a_set = ''
+        if self['context-insensitive-scanner']:
+            a_set = ''
         return 'self._peek(%s)' % a_set
 
     def peek_test(self, a, b):
-        if self.subset(a, b): return '1'
-        if self['context-insensitive-scanner']: a = self.non_ignored_tokens()
+        if self.subset(a, b):
+            return '1'
+        if self['context-insensitive-scanner']:
+            a = self.non_ignored_tokens()
         return self.in_test(self.peek_call(a), a, b)
 
     def not_peek_test(self, a, b):
-        if self.subset(a, b): return '0'
+        if self.subset(a, b):
+            return '0'
         return self.not_in_test(self.peek_call(a), a, b)
 
     def calculate(self):
         while 1:
             for r in self.goals:
                 self.rules[r].setup(self, r)
-            if self.change_count == 0: break
+            if self.change_count == 0:
+                break
             self.change_count = 0
 
         while 1:
             for r in self.goals:
                 self.rules[r].update(self)
-            if self.change_count == 0: break
+            if self.change_count == 0:
+                break
             self.change_count = 0
 
     def dump_information(self):
@@ -155,10 +171,12 @@ class Generator:
                 top.first.sort()
                 top.follow.sort()
                 eps = []
-                if top.accepts_epsilon: eps = ['(null)']
+                if top.accepts_epsilon:
+                    eps = ['(null)']
                 print('     FIRST:', join(top.first+eps, ', '))
                 print('    FOLLOW:', join(top.follow, ', '))
-                for x in top.get_children(): queue.append(x)
+                for x in top.get_children():
+                    queue.append(x)
 
     def generate_output(self):
         self.calculate()
@@ -167,22 +185,23 @@ class Generator:
         self.write("from string import *\n")
         self.write("import re\n")
         self.write("from third_party.yapps2.yappsrt import *\n")
-	self.write("\n")
-	self.write("class ", self.name, "Scanner(Scanner):\n")
+        self.write("\n")
+        self.write("class ", self.name, "Scanner(Scanner):\n")
         self.write("    patterns = [\n")
         for p in self.terminals:
             self.write("        (%s, re.compile(%s)),\n" % (
                 repr(p), repr(self.tokens[p])))
         self.write("    ]\n")
-	self.write("    def __init__(self, str):\n")
-	self.write("        Scanner.__init__(self,None,%s,str)\n" %
+        self.write("    def __init__(self, str):\n")
+        self.write("        Scanner.__init__(self,None,%s,str)\n" %
                    repr(self.ignore))
-	self.write("\n")
+        self.write("\n")
 
         self.write("class ", self.name, "(Parser):\n")
         for r in self.goals:
             self.write(INDENT, "def ", r, "(self")
-            if self.params[r]: self.write(", ", self.params[r])
+            if self.params[r]:
+                self.write(", ", self.params[r])
             self.write("):\n")
             self.rules[r].output(self, INDENT+INDENT)
             self.write("\n")
@@ -206,6 +225,8 @@ class Generator:
             self.write(INDENT, "else: print 'Args:  <rule> [<filename>]'\n")
 
 ######################################################################
+
+
 class Node:
     def __init__(self):
         self.first = []
@@ -238,6 +259,7 @@ class Node:
         "Write out code to _gen_ with _indent_:string indentation"
         gen.write(indent, "assert 0 # Invalid parser node\n")
 
+
 class Terminal(Node):
     def __init__(self, token):
         Node.__init__(self)
@@ -259,6 +281,7 @@ class Terminal(Node):
             gen.write(self.token, " = ")
         gen.write("self._scan(%s)\n" % repr(self.token))
 
+
 class Eval(Node):
     def __init__(self, expr):
         Node.__init__(self)
@@ -276,6 +299,7 @@ class Eval(Node):
     def output(self, gen, indent):
         gen.write(indent, strip(self.expr), '\n')
 
+
 class NonTerminal(Node):
     def __init__(self, name, args):
         Node.__init__(self)
@@ -289,7 +313,7 @@ class NonTerminal(Node):
             if self.accepts_epsilon != self.target.accepts_epsilon:
                 self.accepts_epsilon = self.target.accepts_epsilon
                 gen.changed()
-        except KeyError: # Oops, it's nonexistent
+        except KeyError:  # Oops, it's nonexistent
             print('Error: no rule <%s>' % self.name)
             self.target = self
 
@@ -306,6 +330,7 @@ class NonTerminal(Node):
         gen.write(self.name, " = ")
         gen.write("self.", self.name, "(", self.args, ")\n")
 
+
 class Sequence(Node):
     def __init__(self, *children):
         Node.__init__(self)
@@ -313,13 +338,15 @@ class Sequence(Node):
 
     def setup(self, gen, rule):
         Node.setup(self, gen, rule)
-        for c in self.children: c.setup(gen, rule)
+        for c in self.children:
+            c.setup(gen, rule)
 
         if not self.accepts_epsilon:
             # If it's not already accepting epsilon, it might now do so.
             for c in self.children:
                 # any non-epsilon means all is non-epsilon
-                if not c.accepts_epsilon: break
+                if not c.accepts_epsilon:
+                    break
             else:
                 self.accepts_epsilon = 1
                 gen.changed()
@@ -339,8 +366,10 @@ class Sequence(Node):
         for g_i in range(len(self.children)):
             g = self.children[g_i]
 
-            if empty:  gen.add_to(self.first, g.first)
-            if not g.accepts_epsilon: empty = 0
+            if empty:
+                gen.add_to(self.first, g.first)
+            if not g.accepts_epsilon:
+                empty = 0
 
             if g_i == len(self.children)-1:
                 next = self.follow
@@ -359,6 +388,7 @@ class Sequence(Node):
             # Placeholder for empty sequences, just in case
             gen.write(indent, 'pass\n')
 
+
 class Choice(Node):
     def __init__(self, *children):
         Node.__init__(self)
@@ -366,7 +396,8 @@ class Choice(Node):
 
     def setup(self, gen, rule):
         Node.setup(self, gen, rule)
-        for c in self.children: c.setup(gen, rule)
+        for c in self.children:
+            c.setup(gen, rule)
 
         if not self.accepts_epsilon:
             for c in self.children:
@@ -409,7 +440,8 @@ class Choice(Node):
                 if x in tokens_seen:
                     testset.remove(x)
                     removed.append(x)
-                if x in tokens_unseen: tokens_unseen.remove(x)
+                if x in tokens_unseen:
+                    tokens_unseen.remove(x)
             tokens_seen = tokens_seen + testset
             if removed:
                 if not testset:
@@ -420,7 +452,7 @@ class Choice(Node):
                 print('   due to previous choices using them.')
 
             if testset:
-                if not tokens_unseen: # context sensitive scanners only!
+                if not tokens_unseen:  # context sensitive scanners only!
                     if test == 'if':
                         # if it's the first AND last test, then
                         # we can simply put the code without an if/else
@@ -444,6 +476,7 @@ class Choice(Node):
             gen.write(indent, INDENT, "raise SyntaxError(self._pos, ")
             gen.write("'Could not match ", self.rule, "')\n")
 
+
 class Wrapper(Node):
     def __init__(self, child):
         Node.__init__(self)
@@ -462,6 +495,7 @@ class Wrapper(Node):
         gen.add_to(self.first, self.child.first)
         gen.equate(self.follow, self.child.follow)
 
+
 class Option(Wrapper):
     def setup(self, gen, rule):
         Wrapper.setup(self, gen, rule)
@@ -478,6 +512,7 @@ class Option(Wrapper):
         gen.write(indent, "if %s:\n" %
                   gen.peek_test(self.first, self.child.first))
         self.child.output(gen, indent+INDENT)
+
 
 class Plus(Wrapper):
     def setup(self, gen, rule):
@@ -505,6 +540,7 @@ class Plus(Wrapper):
         gen.write(indent+INDENT, "if %s: break\n" %
                   gen.not_peek_test(union, self.child.first))
 
+
 class Star(Plus):
     def setup(self, gen, rule):
         Wrapper.setup(self, gen, rule)
@@ -527,47 +563,55 @@ class Star(Plus):
 ######################################################################
 # The remainder of this file is from parsedesc.{g,py}
 
+
 def append(lst, x):
     "Imperative append"
     lst.append(x)
     return lst
 
+
 def add_inline_token(tokens, str):
-    tokens.insert( 0, (str, eval(str, {}, {})) )
+    tokens.insert(0, (str, eval(str, {}, {})))
     return Terminal(str)
 
+
 def cleanup_choice(lst):
-    if len(lst) == 0: return Sequence([])
-    if len(lst) == 1: return lst[0]
+    if len(lst) == 0:
+        return Sequence([])
+    if len(lst) == 1:
+        return lst[0]
     return Choice(*tuple(lst))
 
+
 def cleanup_sequence(lst):
-    if len(lst) == 1: return lst[0]
+    if len(lst) == 1:
+        return lst[0]
     return Sequence(*tuple(lst))
 
+
 def cleanup_rep(node, rep):
-    if rep == 'star':   return Star(node)
-    elif rep == 'plus': return Plus(node)
-    else:               return node
+    if rep == 'star':
+        return Star(node)
+    elif rep == 'plus':
+        return Plus(node)
+    else:
+        return node
+
 
 def resolve_name(tokens, id, args):
     if id in [x[0] for x in tokens]:
-	# It's a token
-	if args:
-	    print('Warning: ignoring parameters on TOKEN %s<<%s>>' % (id, args))
+        # It's a token
+        if args:
+            print('Warning: ignoring parameters on TOKEN %s<<%s>>' % (id, args))
         return Terminal(id)
     else:
         # It's a name, so assume it's a nonterminal
         return NonTerminal(id, args)
 
 
-from string import *
-import re
-from .yappsrt import *
-
 class ParserDescriptionScanner(Scanner):
     def __init__(self, str):
-        Scanner.__init__(self,[
+        Scanner.__init__(self, [
             ('"rule"', 'rule'),
             ('"ignore"', 'ignore'),
             ('"token"', 'token'),
@@ -588,7 +632,8 @@ class ParserDescriptionScanner(Scanner):
             ('OR', '[|]'),
             ('STAR', '[*]'),
             ('PLUS', '[+]'),
-            ], ['[ \011\015\012]+', '#.*?\015?\012'], str)
+        ], ['[ \011\015\012]+', '#.*?\015?\012'], str)
+
 
 class ParserDescription(Parser):
     def Parser(self):
@@ -599,7 +644,7 @@ class ParserDescription(Parser):
         Tokens = self.Tokens()
         Rules = self.Rules(Tokens)
         END = self._scan('END')
-        return Generator(ID,Options,Tokens,Rules)
+        return Generator(ID, Options, Tokens, Rules)
 
     def Options(self):
         opt = {}
@@ -619,12 +664,12 @@ class ParserDescription(Parser):
                 ID = self._scan('ID')
                 self._scan('":"')
                 Str = self.Str()
-                tok.append( (ID,Str) )
-            else: # == '"ignore"'
+                tok.append((ID, Str))
+            else:  # == '"ignore"'
                 self._scan('"ignore"')
                 self._scan('":"')
                 Str = self.Str()
-                tok.append( ('#ignore',Str) )
+                tok.append(('#ignore', Str))
         return tok
 
     def Rules(self, tokens):
@@ -635,7 +680,7 @@ class ParserDescription(Parser):
             OptParam = self.OptParam()
             self._scan('":"')
             ClauseA = self.ClauseA(tokens)
-            rul.append( (ID,OptParam,ClauseA) )
+            rul.append((ID, OptParam, ClauseA))
         return rul
 
     def ClauseA(self, tokens):
@@ -656,7 +701,8 @@ class ParserDescription(Parser):
 
     def ClauseC(self, tokens):
         ClauseD = self.ClauseD(tokens)
-        _token_ = self._peek('PLUS', 'STAR', 'STR', 'ID', 'LP', 'LB', 'STMT', 'OR', 'RP', 'RB', '"rule"', 'END')
+        _token_ = self._peek('PLUS', 'STAR', 'STR', 'ID', 'LP',
+                             'LB', 'STMT', 'OR', 'RP', 'RB', '"rule"', 'END')
         if _token_ == 'PLUS':
             PLUS = self._scan('PLUS')
             return Plus(ClauseD)
@@ -670,8 +716,9 @@ class ParserDescription(Parser):
         _token_ = self._peek('STR', 'ID', 'LP', 'LB', 'STMT')
         if _token_ == 'STR':
             STR = self._scan('STR')
-            t = (STR, eval(STR,{},{}))
-            if t not in tokens: tokens.insert( 0, t )
+            t = (STR, eval(STR, {}, {}))
+            if t not in tokens:
+                tokens.insert(0, t)
             return Terminal(STR)
         elif _token_ == 'ID':
             ID = self._scan('ID')
@@ -687,7 +734,7 @@ class ParserDescription(Parser):
             ClauseA = self.ClauseA(tokens)
             RB = self._scan('RB')
             return Option(ClauseA)
-        else: # == 'STMT'
+        else:  # == 'STMT'
             STMT = self._scan('STMT')
             return Eval(STMT[2:-2])
 
@@ -699,64 +746,69 @@ class ParserDescription(Parser):
 
     def Str(self):
         STR = self._scan('STR')
-        return eval(STR,{},{})
-
-
-
+        return eval(STR, {}, {})
 
 
 # This replaces the default main routine
-
 yapps_options = [
     ('context-insensitive-scanner', 'context-insensitive-scanner',
      'Scan all tokens (see docs)')
-    ]
+]
+
 
 def generate(inputfilename, outputfilename='', dump=0, **flags):
     """Generate a grammar, given an input filename (X.g)
     and an output filename (defaulting to X.py)."""
 
     if not outputfilename:
-	if inputfilename[-2:] == '.g':
+        if inputfilename[-2:] == '.g':
             outputfilename = inputfilename[:-2]+'.py'
-	else:
+        else:
             raise Exception("Missing output filename")
 
     print('Input Grammar:', inputfilename)
     print('Output File:', outputfilename)
 
-    DIVIDER = '\n%%\n' # This pattern separates the pre/post parsers
-    preparser, postparser = None, None # Code before and after the parser desc
+    DIVIDER = '\n%%\n'  # This pattern separates the pre/post parsers
+    preparser, postparser = None, None  # Code before and after the parser desc
 
     # Read the entire file
-    s = open(inputfilename,'r').read()
+    s = open(inputfilename, 'r').read()
 
     # See if there's a separation between the pre-parser and parser
     f = find(s, DIVIDER)
-    if f >= 0: preparser, s = s[:f]+'\n\n', s[f+len(DIVIDER):]
+    if f >= 0:
+        preparser, s = s[:f]+'\n\n', s[f+len(DIVIDER):]
 
     # See if there's a separation between the parser and post-parser
     f = find(s, DIVIDER)
-    if f >= 0: s, postparser = s[:f], '\n\n'+s[f+len(DIVIDER):]
+    if f >= 0:
+        s, postparser = s[:f], '\n\n'+s[f+len(DIVIDER):]
 
     # Create the parser and scanner
     p = ParserDescription(ParserDescriptionScanner(s))
-    if not p: return
+    if not p:
+        return
 
     # Now parse the file
     t = wrap_error_reporter(p, 'Parser')
-    if not t: return # Error
-    if preparser is not None: t.preparser = preparser
-    if postparser is not None: t.postparser = postparser
+    if not t:
+        return  # Error
+    if preparser is not None:
+        t.preparser = preparser
+    if postparser is not None:
+        t.postparser = postparser
 
     # Check the options
     for f in list(t.options.keys()):
-        for opt,_,_ in yapps_options:
-            if f == opt: break
+        for opt, _, _ in yapps_options:
+            if f == opt:
+                break
         else:
             print('Warning: unrecognized option', f)
     # Add command line options to the set
-    for f in list(flags.keys()): t.options[f] = flags[f]
+    for f in list(flags.keys()):
+        t.options[f] = flags[f]
 
     # Generate the output
     if dump:
@@ -764,6 +816,7 @@ def generate(inputfilename, outputfilename='', dump=0, **flags):
     else:
         t.output = open(outputfilename, 'w')
         t.generate_output()
+
 
 if __name__ == '__main__':
     import getopt
@@ -777,16 +830,16 @@ if __name__ == '__main__':
             print(('  -f' + flag + ' '*40)[:35] + doc)
     else:
         # Read in the options and create a list of flags
-	flags = {}
-	for opt in optlist:
-	    for flag, name, _ in yapps_options:
-		if opt == ('-f', flag):
-		    flags[name] = 1
-		    break
-	    else:
+        flags = {}
+        for opt in optlist:
+            for flag, name, _ in yapps_options:
+                if opt == ('-f', flag):
+                    flags[name] = 1
+                    break
+            else:
                 if opt == ('--dump', ''):
                     flags['dump'] = 1
-		else:
+                else:
                     print('Warning: unrecognized option', opt[0], opt[1])
 
         generate(*tuple(args), **flags)

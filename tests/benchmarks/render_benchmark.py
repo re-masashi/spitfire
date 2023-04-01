@@ -431,9 +431,9 @@ def run_tests(which=None, number=100, compare=False):
         test_list_fn = 'get_%s_tests' % g
         test = globals()[test_list_fn]()
         if test:
-          tests.extend(test)
+            tests.extend(test)
         else:
-          missing_engines.append(g)
+            missing_engines.append(g)
     # Optionally filter by a set of matching test name (sub)strings.
     if which:
         which_tests = []
@@ -455,7 +455,8 @@ def run_tests(which=None, number=100, compare=False):
 def profile_tests(which=None):
     print('Profiling...')
     print()
-    import hotshot, hotshot.stats
+    import hotshot
+    import hotshot.stats
     profile_data = 'template.prof'
     profile = hotshot.Profile(profile_data)
     profile.runcall(run_tests, which=which, number=1, compare=False)

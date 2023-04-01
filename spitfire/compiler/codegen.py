@@ -161,7 +161,7 @@ class CodeGenerator(object):
             if not extends:
                 extends = [self.options.base_template_full_import_path]
                 if (self.options.base_template_full_import_path !=
-                    (self.options.DEFAULT_BASE_TEMPLATE_FULL_IMPORT_PATH)):
+                        (self.options.DEFAULT_BASE_TEMPLATE_FULL_IMPORT_PATH)):
                     # If we are not using the default base template class, we
                     # need to import the module for the custom template class.
                     # The module for the default base template class is already
@@ -282,7 +282,8 @@ class CodeGenerator(object):
         return [CodeNode(call, input_pos=node.pos)]
 
     def codegenASTForNode(self, node):
-        target_list = self.generate_python(self.build_code(node.target_list)[0])
+        target_list = self.generate_python(
+            self.build_code(node.target_list)[0])
         expression_list = self.generate_python(self.build_code(
             node.expression_list)[0])
         code_node = CodeNode(ASTForNode_tmpl[0] % vars(), input_pos=node.pos)
@@ -335,21 +336,21 @@ class CodeGenerator(object):
             self.generate_python(self.build_code(n)[
                 0]) for n in node.child_nodes
         ]),
-                         input_pos=node.pos)]
+            input_pos=node.pos)]
 
     def codegenASTTupleLiteralNode(self, node):
         return [CodeNode('(%s)' % ', '.join([
             self.generate_python(self.build_code(n)[
                 0]) for n in node.child_nodes
         ]),
-                         input_pos=node.pos)]
+            input_pos=node.pos)]
 
     def codegenASTDictLiteralNode(self, node):
         return [
             CodeNode('{%s}' % ', '.join([
                 '%s: %s' % (self.generate_python(self.build_code(kn)[
                     0]), self.generate_python(self.build_code(vn)[0])
-                           ) for kn, vn in node.child_nodes
+                ) for kn, vn in node.child_nodes
             ]))
         ]
 
@@ -364,7 +365,7 @@ class CodeGenerator(object):
     def codegenASTAttributeNode(self, node):
         return [CodeNode('%s = %s' % (
             node.name, self.generate_python(self.build_code(node.default)[0])),
-                         input_pos=node.pos)]
+            input_pos=node.pos)]
 
     def codegenASTFilterAttributeNode(self, node):
         return [CodeNode('%s = staticmethod(%s)' % (
@@ -380,7 +381,7 @@ class CodeGenerator(object):
     codegenASTArgListNode = codegenASTParameterListNode
 
     def codegenASTGetUDNNode(self, node):
-        #print ' '.join("codegenASTGetUDNNode", id(node), "name", node.name,
+        # print ' '.join("codegenASTGetUDNNode", id(node), "name", node.name,
         #               "expr", node.expression)
         expression = self.generate_python(self.build_code(node.expression)[0])
         name = node.name
@@ -420,7 +421,7 @@ class CodeGenerator(object):
         return [CodeNode("return %(expression)s" % vars(), input_pos=node.pos)]
 
     def codegenASTOptionalWhitespaceNode(self, node):
-        #if self.ignore_optional_whitespace:
+        # if self.ignore_optional_whitespace:
         #  return []
         return [CodeNode(ASTOptionalWhitespaceNode_tmpl[0] % vars(node),
                          input_pos=node.pos)]
@@ -518,7 +519,8 @@ class CodeGenerator(object):
                     #     return ''
                     new_if_condition = ast.IfNode(ast.UnaryOpNode(
                         'not', if_node.test_expression))
-                    new_if_condition.append(ast.ReturnNode(ast.LiteralNode('')))
+                    new_if_condition.append(
+                        ast.ReturnNode(ast.LiteralNode('')))
                     new_code = self.build_code(new_if_condition)
                     if node.uses_globals:
                         needs_globals_added = False
@@ -577,7 +579,7 @@ class CodeGenerator(object):
     # fixme: don't know if i still need this - a 'template function'
     # has an implicit return of the buffer built in - might be simpler
     # to code that rather than adding a return node during the analyze
-    #def codegenASTReturnNode(self, node):
+    # def codegenASTReturnNode(self, node):
     #  code_node = self.codegenDefault(node)
 
     def codegenASTBufferWrite(self, node):
@@ -624,7 +626,7 @@ class CodeGenerator(object):
         cached_name = node.name
         expression = self.generate_python(self.build_code(node.expression)[0])
         # use dictionary syntax to get around coalescing 'global' statements
-        #globalize_var = CodeNode('global %(cached_name)s' % vars())
+        # globalize_var = CodeNode('global %(cached_name)s' % vars())
         if_code = CodeNode("if %(cached_name)s is None:" % vars(),
                            input_pos=node.pos)
         if_code.append(

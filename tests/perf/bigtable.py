@@ -37,7 +37,9 @@ except ImportError:
     cet = None
 
 try:
-    import neo_cgi, neo_cs, neo_util
+    import neo_cgi
+    import neo_cs
+    import neo_util
 except ImportError:
     neo_cgi = None
 
@@ -74,8 +76,8 @@ try:
 except ImportError:
     CheetahTemplate = None
 
-table = [dict(a=1,b=2,c=3,d=4,e=5,f=6,g=7,h=8,i=9,j=10)
-          for x in range(1000)]
+table = [dict(a=1, b=2, c=3, d=4, e=5, f=6, g=7, h=8, i=9, j=10)
+         for x in range(1000)]
 
 if MarkupTemplate:
     genshi_tmpl = MarkupTemplate("""
@@ -110,10 +112,11 @@ if MakoTemplate:
   % endfor
 </table>
 """)
+
     def test_mako():
         """Mako Template"""
         data = mako_tmpl.render(table=table)
-        #print "mako", len(data)
+        # print "mako", len(data)
 
 if SpitfireTemplate:
     import spitfire.compiler.analyzer
@@ -134,35 +137,34 @@ if SpitfireTemplate:
 
     spitfire_tmpl_o1 = spitfire.compiler.util.load_template(
         spitfire_src, 'spitfire_tmpl_o1', spitfire.compiler.options.o1_options,
-        {'enable_filters':enable_filters})
+        {'enable_filters': enable_filters})
 
     spitfire_tmpl_o2 = spitfire.compiler.util.load_template(
         spitfire_src, 'spitfire_tmpl_o2', spitfire.compiler.options.o2_options,
-        {'enable_filters':enable_filters})
+        {'enable_filters': enable_filters})
 
     spitfire_tmpl_o3 = spitfire.compiler.util.load_template(
         spitfire_src, 'spitfire_tmpl_o3', spitfire.compiler.options.o3_options,
-        {'enable_filters':enable_filters})
-
+        {'enable_filters': enable_filters})
 
     def test_spitfire():
         """Spitfire template"""
-        data = spitfire_tmpl(search_list=[{'table':table}]).main()
-        #print "spitfire", len(data)
+        data = spitfire_tmpl(search_list=[{'table': table}]).main()
+        # print "spitfire", len(data)
 
     def test_spitfire_o1():
         """Spitfire template -O1"""
-        data = spitfire_tmpl_o1(search_list=[{'table':table}]).main()
-        #print "spitfire -O1", len(data)
+        data = spitfire_tmpl_o1(search_list=[{'table': table}]).main()
+        # print "spitfire -O1", len(data)
 
     def test_spitfire_o2():
         """Spitfire template -O2"""
-        data = spitfire_tmpl_o2(search_list=[{'table':table}]).main()
+        data = spitfire_tmpl_o2(search_list=[{'table': table}]).main()
 
     def test_spitfire_o3():
         """Spitfire template -O3"""
-        data = spitfire_tmpl_o3(search_list=[{'table':table}]).main()
-        #print "spitfire -O3", len(data)
+        data = spitfire_tmpl_o3(search_list=[{'table': table}]).main()
+        # print "spitfire -O3", len(data)
 
 if CheetahTemplate:
     cheetah_src = """<table>
@@ -175,19 +177,20 @@ if CheetahTemplate:
 #end for
 </table>"""
     pre = set([k for k, v in sys.modules.items() if v])
-    cheetah_template = CheetahTemplate.Template(cheetah_src, searchList=[{'table':table}])
+    cheetah_template = CheetahTemplate.Template(
+        cheetah_src, searchList=[{'table': table}])
     # force compile
     post = set([k for k, v in sys.modules.items() if v])
-    #print post - pre
+    # print post - pre
 
-    #print type(cheetah_template)
+    # print type(cheetah_template)
     cheetah_template.respond()
     cheetah_template = type(cheetah_template)
 
     def test_cheetah():
         """Cheetah template"""
-        data = cheetah_template(searchList=[{'table':table}]).respond()
-        #print "cheetah", len(data)
+        data = cheetah_template(searchList=[{'table': table}]).respond()
+        # print "cheetah", len(data)
 
 if jinja2:
     template = jinja2.Environment().from_string(
@@ -201,7 +204,8 @@ if jinja2:
         </tr>
         {%endfor%}
         """
-        )
+    )
+
     def test_jinja2():
         '''Jinja2 templates'''
         template.render(table=table)
@@ -211,7 +215,7 @@ if genshi:
         """Genshi template"""
         stream = genshi_tmpl.generate(table=table)
         data = stream.render('html', strip_whitespace=False)
-        #print "genshi", len(data)
+        # print "genshi", len(data)
 
     def disabled_test_genshi_text():
         """Genshi text template"""
@@ -264,7 +268,7 @@ if kid:
             for row in table:
                 td = cet.SubElement(_table, 'tr')
                 for c in list(row.values()):
-                    cet.SubElement(td, 'td').text=str(c)
+                    cet.SubElement(td, 'td').text = str(c)
             kid_tmpl2.table = _table
             kid_tmpl2.serialize(output='html')
 
@@ -275,7 +279,7 @@ if et:
         for row in table:
             tr = et.SubElement(_table, 'tr')
             for c in list(row.values()):
-                et.SubElement(tr, 'td').text=str(c)
+                et.SubElement(tr, 'td').text = str(c)
         et.tostring(_table)
 
 if cet:
@@ -285,7 +289,7 @@ if cet:
         for row in table:
             tr = cet.SubElement(_table, 'tr')
             for c in list(row.values()):
-                cet.SubElement(tr, 'td').text=str(c)
+                cet.SubElement(tr, 'td').text = str(c)
         cet.tostring(_table)
 
 if neo_cgi:
@@ -306,6 +310,7 @@ if neo_cgi:
 </table>""")
         cs.render()
 
+
 def test_python_cstringio():
     """cStringIO"""
     buffer = io.StringIO()
@@ -320,6 +325,7 @@ def test_python_cstringio():
         write('</tr>\n')
     write('</table>')
     return buffer.getvalue()
+
 
 def test_python_stringio():
     """StringIO"""
@@ -336,6 +342,7 @@ def test_python_stringio():
         write('</tr>\n')
     write('</table>')
     return buffer.getvalue()
+
 
 def test_python_array():
     """list concat"""
@@ -362,7 +369,7 @@ def run(which=None, number=10):
              'test_cheetah',
              'test_spitfire', 'test_spitfire_o1',
              'test_spitfire_o2', 'test_spitfire_o3',
-             'test_python_stringio', 'test_python_cstringio', 'test_python_array', 
+             'test_python_stringio', 'test_python_cstringio', 'test_python_array',
              'test_jinja2'
              ]
 
@@ -378,14 +385,16 @@ def run(which=None, number=10):
             result = '   (not installed?)'
         else:
             result = '%16.2f ms' % (1000 * time)
-        print('%-35s %s' % (getattr(sys.modules[__name__], test).__doc__, result))
+        print('%-35s %s' %
+              (getattr(sys.modules[__name__], test).__doc__, result))
 
 
 if __name__ == '__main__':
     which = [arg for arg in sys.argv[1:] if arg[0] != '-']
 
     if '-p' in sys.argv:
-        import hotshot, hotshot.stats
+        import hotshot
+        import hotshot.stats
         prof = hotshot.Profile("template.prof")
         benchtime = prof.runcall(run, which, number=1)
         stats = hotshot.stats.load("template.prof")

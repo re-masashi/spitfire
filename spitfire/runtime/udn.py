@@ -238,6 +238,7 @@ def _resolve_from_search_list(search_list, name, default=Unspecified):
     else:
         return UnresolvedPlaceholder
 
+
 # Define Python/C alternates.
 _python_resolve_from_search_list = _resolve_from_search_list
 _python_resolve_udn = _resolve_udn
@@ -274,7 +275,9 @@ def set_accelerator(enabled=True, enable_test_mode=False):
         resolve_udn = _python_resolve_udn
 
     if enabled and _udn is None:
-        logging.warning('unable to enable acceleration, _udn module not loaded')
+        logging.warning(
+            'unable to enable acceleration, _udn module not loaded')
+
 
 # give it our best shot
 set_accelerator()

@@ -37,12 +37,12 @@ def make_i18n_message(raw_msg, macro_ast):
     # less scan this one level of nodes -- there are no nested i18n sections yet
     output = StringIO.StringIO()
     for i, n in enumerate(macro_ast.child_nodes):
-        #print i, type(n), "start", n.start, "end", n.end
-        #print "raw:", "'%s'" % raw_msg[n.start:n.end]
+        # print i, type(n), "start", n.start, "end", n.end
+        # print "raw:", "'%s'" % raw_msg[n.start:n.end]
 
         if isinstance(n, ast.PlaceholderSubstitutionNode):
             raw_placeholder_expression = raw_msg[n.start:n.end]
-            #output.write(make_placeholder_name(n))
+            # output.write(make_placeholder_name(n))
             output.write(raw_placeholder_expression)
         else:
             output.write(text.i18n_mangled_message(n.value))
@@ -58,10 +58,10 @@ def macro_i18n(macro_node, arg_map, compiler):
     macro_content_ast = util.parse(macro_node.value, 'i18n_goal')
     i18n_msg = make_i18n_message(macro_node.value, macro_content_ast)
     i18n_msg_utf8 = i18n_msg.encode(sys.getdefaultencoding())
-    #print "macro_content_ast"
-    #print "orginal:", macro_node.value
-    #print "i18n:", i18n_msg_utf8
-    #visitor.print_tree(macro_content_ast)
+    # print "macro_content_ast"
+    # print "orginal:", macro_node.value
+    # print "i18n:", i18n_msg_utf8
+    # visitor.print_tree(macro_content_ast)
     return i18n_msg
 
 

@@ -256,12 +256,12 @@ class Compiler(object):
             self.print_stderr_message(str(err), pos=pos, is_error=True)
             sys.exit(1)
 
-    def compile_template(self, src_text, classname):
+    def compile_template(self, src_text, classname, filename=None):
         if self.tune_gc:
             gc.disable()
         try:
             self._reset()
-            self._parse_tree = util.parse_template(src_text, self.xspt_mode)
+            self._parse_tree = util.parse_template(src_text, self.xspt_mode, filename)
             return self._compile_ast(self._parse_tree, classname)
         finally:
             if self.tune_gc:
@@ -274,7 +274,7 @@ class Compiler(object):
         self.classname = util.filename2classname(filename)
         self.src_text = util.read_template_file(filename)
         self.generate_line_map()
-        src_code = self.compile_template(self.src_text, self.classname)
+        src_code = self.compile_template(self.src_text, self.classname, filename)
         if self.write_file:
             self.write_src_file(src_code)
         return src_code

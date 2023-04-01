@@ -152,7 +152,7 @@ class TreeVisitor(object):
         test_expression = VisitNode('test_expression',
                                     self.build_text(node.test_expression))
         if_node.append(test_expression)
-        #if_node.append(VisitNode(str(node.scope)))
+        # if_node.append(VisitNode(str(node.scope)))
         for n in node.child_nodes:
             if_node.extend(self.build_text(n))
         visit_nodes = [if_node]
@@ -172,14 +172,14 @@ class TreeVisitor(object):
         v = self.visitDefault(node)[0]
         for n in [node.test_expression, node.true_expression,
                   node.false_expression]:
-            #print "visitASTParameterListNode:", n, text
+            # print "visitASTParameterListNode:", n, text
             v.append(VisitNode(str(n)))
         return [v]
 
     def visitASTParameterListNode(self, node):
         v = self.visitDefault(node)[0]
         for n in node.child_nodes:
-            #print "visitASTParameterListNode:", n, text
+            # print "visitASTParameterListNode:", n, text
             v.append(VisitNode(str(n)))
         return [v]
 
@@ -248,7 +248,7 @@ class TreeVisitor(object):
         v = self.visitDefault(node)[0]
         if node.parameter_list:
             v.extend(self.build_text(node.parameter_list))
-        #v.append(VisitNode(str(node.scope)))
+        # v.append(VisitNode(str(node.scope)))
 
         for n in node.child_nodes:
             v.extend(self.build_text(n))

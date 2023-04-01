@@ -101,7 +101,7 @@ class XHTML2AST(object):
                                                       attr.localName))
                     attr_output_ast.extend(self.make_attr_node(attr))
                     # print "attr_handler:", attr.prefix, attr.localName
-                    #processed_any_op = True
+                    # processed_any_op = True
             for attr_name in attr_prune_list:
                 try:
                     dom_node.removeAttribute(attr_name)
@@ -114,7 +114,7 @@ class XHTML2AST(object):
         else:
             node_list.extend(self.handle_default(dom_node))
 
-        #for child in dom_node.childNodes:
+        # for child in dom_node.childNodes:
         #  node_list.extend(self.build_ast(child))
 
         return node_list
@@ -229,7 +229,8 @@ class XHTML2AST(object):
         # print "handle_define", node_name
         # fixme: this is a nasty temp hack, it will generate the correct code
         # for 1 define, but multiple expressions won't work
-        expr_ast = util.parse(dom_node.getAttribute(attr_name), 'argument_list')
+        expr_ast = util.parse(
+            dom_node.getAttribute(attr_name), 'argument_list')
         dom_node.removeAttribute(attr_name)
         node_list.extend(expr_ast)
         node_list.extend(self.build_ast(dom_node))
@@ -237,7 +238,7 @@ class XHTML2AST(object):
 
     def handle_content(self, dom_node, attr_name):
         debug("handle_content", dom_node)
-        #traceback.print_stack()
+        # traceback.print_stack()
         expr_ast = util.parse(
             dom_node.getAttribute(attr_name), 'rhs_expression')
         dom_node.removeAttribute(attr_name)
@@ -302,8 +303,8 @@ class XHTML2AST(object):
         if self.has_child_stuff(dom_node):
             debug("has_child_stuff:", dom_node)
             fn.extend(self.build_ast(dom_node))
-            #fn.append(self.make_tag_node(dom_node))
-            #for n in dom_node.childNodes:
+            # fn.append(self.make_tag_node(dom_node))
+            # for n in dom_node.childNodes:
             #  fn.extend(self.build_ast(n))
         else:
             # print "no children"
@@ -318,16 +319,16 @@ class XHTML2AST(object):
             fn.prepend(self.build_ast(dom_node.previousSibling))
 
             # now remove the previous sibling
-            #print "node", dom_node
-            #print "parent", dom_node.parentNode
-            #print ' '.join("previous", dom_node.previousSibling,
+            # print "node", dom_node
+            # print "parent", dom_node.parentNode
+            # print ' '.join("previous", dom_node.previousSibling,
             #               id(dom_node.previousSibling))
-            #print "next", dom_node.nextSibling, id(dom_node.nextSibling)
-            #dom_node.parentNode.removeChild(dom_node.previousSibling)
+            # print "next", dom_node.nextSibling, id(dom_node.nextSibling)
+            # dom_node.parentNode.removeChild(dom_node.previousSibling)
             node_list.append(ast.EatPrevious())
 
         node_list.append(fn)
-        #fn.extend(self.make_tag_node(dom_node, close=True))
+        # fn.extend(self.make_tag_node(dom_node, close=True))
         return node_list
 
     def handle_condition(self, dom_node, attr_name):

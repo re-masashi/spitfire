@@ -43,7 +43,7 @@ class ASTNode(object):
     def __eq__(self, node):
         return bool(type(self) == type(
             node) and self.name == node.name and self.value == node.value and
-                    self.child_nodes == node.child_nodes)
+            self.child_nodes == node.child_nodes)
 
     def __hash__(self):
         return hash('%s%s%s%s' % (type(self), self.name, self.value,
@@ -341,7 +341,7 @@ class CallFunctionNode(ASTNode):
                     node.library_function and self.expression == node.expression
                     and self.arg_list == node.arg_list and (
                         self.sanitization_state == node.sanitization_state
-                    ) and self.child_nodes == node.child_nodes)
+        ) and self.child_nodes == node.child_nodes)
 
     def __hash__(self):
         return hash('%s%s%s%s%s' % (type(self), hash(self.library_function),
@@ -446,7 +446,7 @@ class FilterNode(ASTNode):
     def __eq__(self, node):
         return bool(type(self) == type(
             node) and self.expression == node.expression and
-                    self.filter_function_node == node.filter_function_node)
+            self.filter_function_node == node.filter_function_node)
 
     def __hash__(self):
         return hash('%s%s%s' % (type(self), hash(self.expression),
@@ -636,8 +636,8 @@ class IfNode(ASTNode):
     def __eq__(self, other):
         return bool(type(self) == type(
             other) and self.test_expression == other.test_expression and
-                    self.else_ == other.else_ and self.scope == other.scope and
-                    self.child_nodes == other.child_nodes)
+            self.else_ == other.else_ and self.scope == other.scope and
+            self.child_nodes == other.child_nodes)
 
     def __hash__(self):
         return hash("%s%s%s%s%s" %
@@ -718,7 +718,7 @@ class FromNode(ImportNode):
     def __eq__(self, node):
         return bool(type(self) == type(
             node) and self.module_name_list == node.module_name_list and
-                    self.identifier == node.identifier)
+            self.identifier == node.identifier)
 
     def __hash__(self):
         return hash('%s%s%s' % (type(self), hash(tuple(self.module_name_list)),
@@ -838,7 +838,7 @@ class SliceNode(ASTNode):
     def __eq__(self, node):
         return bool(type(self) == type(
             node) and self.expression == node.expression and
-                    self.slice_expression == node.slice_expression)
+            self.slice_expression == node.slice_expression)
 
     def __hash__(self):
         return hash('%s%s%s' % (type(self), hash(self.expression),
@@ -1005,7 +1005,7 @@ class Scope(object):
 
 class ScopeSet(set):
     pass
-    #def add(self, o):
+    # def add(self, o):
     #  set.add(self, o)
 
 
@@ -1136,6 +1136,7 @@ def track_line_numbers(exempt_methods=()):
         return cls
 
     return decorator
+
 
 # This is a list of all of the nodes that are considered statements.
 # They can not appear on the right hand of an assignment. This list is

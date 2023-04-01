@@ -24,7 +24,7 @@ class Foo(object):
     placeholder_cache = None
 
     def foo_method(self):
-      pass
+        pass
 
 
 class TestResolvePlaceholder(unittest.TestCase):
@@ -63,9 +63,11 @@ class TestResolvePlaceholderWithCache(unittest.TestCase):
     def test_in_search_list_object(self):
         template = Foo()
         template.placeholder_cache = {}
-        self.assertEqual(udn.resolve_placeholder('boom', template, None), 'bam')
+        self.assertEqual(udn.resolve_placeholder(
+            'boom', template, None), 'bam')
         self.assertIn('boom', template.placeholder_cache)
-        self.assertEqual(udn.resolve_placeholder('boom', template, None), 'bam')
+        self.assertEqual(udn.resolve_placeholder(
+            'boom', template, None), 'bam')
 
     def test_method_cycle_elimination(self):
         template = Foo()

@@ -26,6 +26,8 @@ def no_skip():
 # Do not inherit from unittest.TestCase to ensure that these tests don't run.
 # Add tests here and they will be run for the C and Python implementations. This
 # should make sure that both implementations are equivalent.
+
+
 class _TestTemplate(object):
 
     template_cls = None

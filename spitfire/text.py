@@ -65,7 +65,7 @@ mangled_character_names = [
 ]
 
 char_map = dict(list(zip(normal_characters, [unicodedata.lookup(name)
-                                        for name in mangled_character_names])))
+                                             for name in mangled_character_names])))
 
 
 # return a string with interesting unicode characters to make sure

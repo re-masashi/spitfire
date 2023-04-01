@@ -33,14 +33,17 @@ class UndefinedPlaceholder(object):
         # was an UndefinedPlaceholder in this statement:  $user_object.name
         self.__name = name
         self.__search_list = search_list
+        self.error_message = f'{self.__name} was not found in scope.'
 
     def __bool__(self):
         return False
 
     def __str__(self):
+        print(f'{self.__name} is not in scope.')
         raise PlaceholderError(self.__name, self.get_placeholder_names())
 
     def __call__(self, *pargs, **kargs):
+        print(f'{self.__name} is not in scope.')
         raise PlaceholderError(self.__name, self.get_placeholder_names())
 
     def get_placeholder_names(self):

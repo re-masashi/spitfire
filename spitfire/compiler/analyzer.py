@@ -200,7 +200,8 @@ class SemanticAnalyzer(object):
         for pn in self.optimize_parsed_nodes(pnode.child_nodes):
             for_node.extend(self.build_ast(pn))
 
-        for_node.child_nodes = self.optimize_buffer_writes(for_node.child_nodes)
+        for_node.child_nodes = self.optimize_buffer_writes(
+            for_node.child_nodes)
 
         # Restore original scope identifiers after children have been analyzed.
         self.template.local_scope_identifiers = template_local_scope_identifiers
@@ -386,7 +387,8 @@ class SemanticAnalyzer(object):
         if (self.options.fail_nested_defs and not allow_nesting and
                 not isinstance(pnode.parent, ast.TemplateNode)):
             self.compiler.error(
-                SemanticAnalyzerError('nested #def directives are not allowed'),
+                SemanticAnalyzerError(
+                    'nested #def directives are not allowed'),
                 pos=pnode.pos)
 
         function = ast.FunctionNode(pnode.name, pos=pnode.pos)
@@ -409,7 +411,8 @@ class SemanticAnalyzer(object):
         for pn in self.optimize_parsed_nodes(pnode.child_nodes):
             function.extend(self.build_ast(pn))
         function = self.build_ast(function)[0]
-        function.child_nodes = self.optimize_buffer_writes(function.child_nodes)
+        function.child_nodes = self.optimize_buffer_writes(
+            function.child_nodes)
         self.template.append(function)
 
         # Restore original scope identifiers after children have been analyzed.
@@ -479,7 +482,8 @@ class SemanticAnalyzer(object):
     def analyzeGlobalNode(self, pnode):
         if not isinstance(pnode.parent, ast.TemplateNode):
             self.compiler.error(
-                SemanticAnalyzerError('#global must be a top-level directive.'),
+                SemanticAnalyzerError(
+                    '#global must be a top-level directive.'),
                 pos=pnode.pos)
         self.template.global_placeholders.add(pnode.name)
         return []

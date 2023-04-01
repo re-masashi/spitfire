@@ -11,7 +11,40 @@ from spitfire.third_party.yapps2 import yappsrt
 # but it seems to have been the right solution for a number of small problems
 # allong the way.
 _restrict_cache = {}
-
+human_patterns = dict([
+            ('DOT', '.'),
+            ('NUM', 'valid number'),
+            ('ID', 'valid identifier'),
+            ('SINGLE_QUOTE_STR', 'single quoted string literal'),
+            ('DOUBLE_QUOTE_STR', 'single quoted string literal'),
+            ('SINGLE_LINE_COMMENT', 'single line comment'),
+            ('MULTI_LINE_COMMENT', 'multi line comment'),
+            ('ASSIGN_OPERATOR', '='),
+            ('COMP_OPERATOR', '"<=", ">=", "==", ">", "<", "!=", "in"'),
+            ('OPEN_PAREN', '('),
+            ('PLACEHOLDER_OPEN_PAREN', '('),
+            ('CLOSE_PAREN', ')'),
+            ('OPEN_BRACKET', '['),
+            ('CLOSE_BRACKET', ']'),
+            ('PLACEHOLDER_OPEN_BRACE', '{'),
+            ('PLACEHOLDER_CLOSE_BRACE', '['),
+            ('OPEN_BRACE', '{'),
+            ('CLOSE_BRACE', '[ \t]*\\}[ \t]*'),
+            ('PIPE', '|'),
+            ('COMMA_DELIMITER', ','),
+            ('COLON_DELIMITER', ':'),
+            ('SPACE', '" "'),
+            ('CLOSE_DIRECTIVE_TOKEN', 'either "\\n" or "#"'),
+            ('END_DIRECTIVE', '#end'),
+            ('START_DIRECTIVE', '#'),
+            ('START_PLACEHOLDER', '\\$'),
+            ('LITERAL_DOLLAR_SIGN', '\\\\\\$'),
+            ('LITERAL_HASH', '\\\\#'),
+            ('LITERAL_BACKSLASH', '\\\\'),
+            ('NEWLINE', '\\n'),
+            ('PYTHON_LINE', '.+'),
+            ('END', '$'),
+        ])
 
 class SpitfireScanner(parser._SpitfireParserScanner):
 
@@ -60,7 +93,11 @@ class SpitfireScanner(parser._SpitfireParserScanner):
             # If we didn't find anything, raise an error
             msg = "Bad Token"
             if restrict:
-                msg = "Trying to find one of " + ', '.join(restrict)
+                msg = "\033[1;31m \n ==========ERROR=========: \n Expected "
+                for r in restrict: 
+                    msg += human_patterns.get(r, r) + ','
+
+                msg+="\033[1;m "
             raise yappsrt.SyntaxError(self.pos, msg)
 
         # Create a token with this data
