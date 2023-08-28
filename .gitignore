@@ -4,5 +4,7 @@
 build/
 spitfire.egg-info/
 
+dist/
+
 # Local pyenv version files
 .python-version
