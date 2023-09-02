@@ -1,10 +1,5 @@
-#def check_age($age, $name, $gap)
-#if ($age >= 18)
-$name can drive a car or a bike.
-#else
-$name can only ride a bicycle for now. Please wait for $gap years.
-#end if
-#end def
-$name is $age years old
-#set $gap = 18- $age
-$check_age($age, $name, $gap)
+<ul>
+#for $fruit in $list
+	<li> $fruit.name costs $fruit.price</li>
+#end for
+</ul>
