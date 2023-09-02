@@ -8,3 +8,4 @@ dist/
 
 # Local pyenv version files
 .python-version
+docs/_build
