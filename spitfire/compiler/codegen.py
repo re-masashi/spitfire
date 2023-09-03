@@ -104,6 +104,7 @@ class CodeGenerator(object):
         module_code = CodeNode()
         module_code.append_line('#!/usr/bin/env python')
         module_code.append_line('# -*- coding: %s -*-' % node.encoding)
+        module_code.append_line('from builtins import *')
         if node.baked:
             module_code.append_line('# Baked Mode')
             self.baked_mode = True

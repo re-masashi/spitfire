@@ -1115,7 +1115,7 @@ class FinalPassAnalyzer(_BaseAnalyzer):
 
 template_function_re = re.compile('^[^#]*#(def|block)\s+(\w+)')
 extends_re = re.compile('^#extends\s+([\.\w]+)')
-template_extensions = ('.spt', '.tmpl')
+template_extensions = ('.spt', '.tmpl', '.spf')
 
 
 def _extend_to_real_path(base_dir, ex_path):
@@ -1124,7 +1124,7 @@ def _extend_to_real_path(base_dir, ex_path):
         if os.path.exists(rpath):
             return rpath
     raise Exception(
-        'could not find .spt or .tmpl file for %s during dependency check' %
+        'could not find .spt, .spf, .tmpl file for %s during dependency check' %
         ex_path)
 
 
