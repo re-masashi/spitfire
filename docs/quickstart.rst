@@ -68,4 +68,4 @@ Run this in your terminal...
 
 Congratulations!!
 -----------------
-You succesfully used Spitfire!! Now check out the `language overview </language%20overview.html>`_.
+You succesfully used Spitfire!! Now check out the `language overview <language%20overview.html>`_.

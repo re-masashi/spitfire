@@ -9,7 +9,7 @@ Spitfire port forPython3
 
 __author__ = 'Nafi Amaan Hossain'  # Originally by Mike Solomon
 __author_email__ = '<nafines007@gmail.com>'
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 __license__ = 'BSD License'
 
 import spitfire
@@ -53,7 +53,8 @@ class Environment():
                 self.compiled_templates[normalised_string] = spitfire.compiler.util.load_template_file(
                     str(x), # x has type PosixPath, needs to be normalised.
                     normalised_string,
-                    analyzer_options=self.o3_opts
+                    analyzer_options=self.o3_opts,
+                    compiler_options={"include_path": self.home}
                 )
         
 

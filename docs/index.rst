@@ -9,7 +9,7 @@ It is just as simple as any other templating engine but faster(a lot).
   "Any sufficiently advanced technology is indistinguishable from magic"
   ~ Arthur C. Clarke
 
-To break it down to you, Spitfire has a compiler that optimizes and reduces the time taken by various operations. This makes Spitfire *magically fast*. No trade-offs, oure performance.
+To break it down to you, Spitfire has a compiler that optimizes and reduces the time taken by various operations. This makes Spitfire *magically fast*. No trade-offs, pure performance.
 
 Some `wonderful people <https://github.com/re-masashi/spitfire/blob/master/CONTRIBUTORS>`_ initially created Spitfire for Python2, which wasn't usable with the Python we know today (Python3). Since such a magical work fannot be left behind, this was ported to Python3.
 

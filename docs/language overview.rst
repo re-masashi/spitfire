@@ -117,4 +117,34 @@ Sometimes, your input text needs to be sanitized or filetered to prevent XSS Att
 	Bad input values such as <script>alert("this is unsafe!!");</script>
 
 
+Imports
+-------
+
+Just like python, you can import things in spitfire.
+
+.. code-block:: spitfire
+
+	#from pprint import pprint
+	## or
+	#import json
+
+
+Reusing Templates
+-----------------
+
+.. code-block:: spitfire
+	:caption: page.spf
+
+	#extends base
+
+	#def title()
+		Tales of a Loner
+	#end def
+
+.. code-block:: spitfire
+	:caption: base.spf
+
+	#block title
+	Hewwo ## default value
+	#end title
 
