@@ -39,7 +39,7 @@ class Environment():
             self, 
             dirpath: str = None, 
             pattern:str='*.spf',
-            includes: list = []
+            includes: str = 'base.spf'
     ):
         if dirpath==None:
             dirpath = self.home
@@ -47,7 +47,7 @@ class Environment():
         if dirpath[-1]!='/':
             dirpath += '/'
 
-        for x in includes:
+        for x in pathlib.Path(dirpath).glob(includes):
             if not x.is_dir():
                 normalised_string = str(x).split('/')[-1]\
                             .split('.')[0]\
