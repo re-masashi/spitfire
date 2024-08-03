@@ -35,11 +35,35 @@ class Environment():
                                                        analyzer_options=self.o3_opts)
         return tmpl_o3(search_list=opts).main()
 
-    def load_dir(self, dirpath: str = None, pattern:str='*.spf'):
+    def load_dir(
+            self, 
+            dirpath: str = None, 
+            pattern:str='*.spf',
+            includes: list = []
+    ):
         if dirpath==None:
             dirpath = self.home
+        
         if dirpath[-1]!='/':
             dirpath += '/'
+
+        for x in includes:
+            if not x.is_dir():
+                normalised_string = str(x).split('/')[-1]\
+                            .split('.')[0]\
+                            .replace('-','_')\
+                            .replace(' ', '_')\
+                            .replace('+','_')\
+                            .replace('%', 'percent')\
+                            .replace('$','dollar')\
+                            .replace('*', 'asterisk')
+                self.compiled_templates[normalised_string] = spitfire.compiler.util.load_template_file(
+                    str(x), # x has type PosixPath, needs to be normalised.
+                    normalised_string,
+                    analyzer_options=self.o3_opts,
+                    compiler_options={"include_path": self.home}
+                )
+
         for x in pathlib.Path(dirpath).glob(pattern):
             if not x.is_dir():
                 normalised_string = str(x).split('/')[-1]\
