@@ -9,7 +9,7 @@ Spitfire port forPython3
 
 __author__ = 'Nafi Amaan Hossain'  # Originally by Mike Solomon
 __author_email__ = '<nafines007@gmail.com>'
-__version__ = '0.2.4'
+__version__ = '0.2.6'
 __license__ = 'BSD License'
 
 import spitfire
@@ -19,21 +19,32 @@ import pathlib
 
 
 class Environment():
-    def __init__(self, dirpath: str, config={}):
+    def __init__(self, dirpath: str, config={}, debug=False):
         if dirpath[-1]!='/':
             dirpath+='/'
         self.home = dirpath
         self.compiled_templates = {}
-        self.o3_opts = spitfire.compiler.options.o3_options
+        if debug:
+            self.analyzer_opts = spitfire.compiler.options.o3_options
+        else:
+            self.analyzer_opts = spitfire.compiler.options.o1_options
 
-    def render(self, filename: str, opts, template_name="_", enable_filters=False):
+    def render(
+        self, 
+        filename: str, 
+        opts, 
+        template_name="_", 
+        enable_filters=False
+    ):
         if type(opts)!=list:
             opts = [opts]
 
-        tmpl_o3 = spitfire.compiler.util.load_template_file(self.home+filename,
-                                                       template_name,
-                                                       analyzer_options=self.o3_opts)
-        return tmpl_o3(search_list=opts).main()
+        tmpl = spitfire.compiler.util.load_template_file(self.home+filename,
+                template_name,
+                analyzer_options=self.analyzer_options,
+                compiler_options={"include_path": self.home})
+
+        return tmpl(search_list=opts).main()
 
     def load_dir(
             self, 
@@ -60,7 +71,7 @@ class Environment():
                 self.compiled_templates[normalised_string] = spitfire.compiler.util.load_template_file(
                     str(x), # x has type PosixPath, needs to be normalised.
                     normalised_string,
-                    analyzer_options=self.o3_opts,
+                    analyzer_options=self.analyzer_opts,
                     compiler_options={"include_path": self.home}
                 )
 
@@ -77,12 +88,15 @@ class Environment():
                 self.compiled_templates[normalised_string] = spitfire.compiler.util.load_template_file(
                     str(x), # x has type PosixPath, needs to be normalised.
                     normalised_string,
-                    analyzer_options=self.o3_opts,
+                    analyzer_options=self.analyzer_opts,
                     compiler_options={"include_path": self.home}
                 )
         
 
-    def render_template(self, template:str, opts):
+    def render_template(self, template: str, opts):
+        if self.debug:
+            return self.render(template+'.spf', opts)
+        
         if type(opts) != list:
             opts = [opts]
         if self.compiled_templates.get(template) == None:
