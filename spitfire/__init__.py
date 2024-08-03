@@ -9,7 +9,7 @@ Spitfire port forPython3
 
 __author__ = 'Nafi Amaan Hossain'  # Originally by Mike Solomon
 __author_email__ = '<nafines007@gmail.com>'
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 __license__ = 'BSD License'
 
 import spitfire
